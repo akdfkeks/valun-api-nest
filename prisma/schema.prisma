@@ -1,0 +1,30 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  uuid  String @id @default(value: uuid())
+  id    String @unique
+  pw    String
+  name  String
+  nick  String @unique
+  broom Int    @default(value: 0)
+}
+
+model Issue {
+  id        Int         @id @default(value: autoincrement())
+  status    IssueStatus @default(value: UNSOLVED)
+  createdAt DateTime    @default(value: now())
+}
+
+enum IssueStatus {
+  UNSOLVED
+  PENDING
+  SOLVED
+  REPORTED
+}
