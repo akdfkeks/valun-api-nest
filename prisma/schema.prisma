@@ -8,18 +8,80 @@ generator client {
 }
 
 model User {
-  uuid  String @id @default(value: uuid())
-  id    String @unique
-  pw    String
-  name  String
-  nick  String @unique
-  broom Int    @default(value: 0)
+  uuid         String         @id @default(value: uuid())
+  id           String         @unique @db.VarChar(63)
+  pw           String         @db.VarChar(255)
+  name         String         @db.VarChar(63)
+  nick         String         @unique @db.VarChar(63)
+  broom        Int            @default(value: 0)
+  createdAt    DateTime       @default(value: now())
+  issueComment IssueComment[]
+  issueHistory IssueHistory[]
+  Issue        Issue[]
 }
 
 model Issue {
+  id           Int                 @id @default(value: autoincrement())
+  user         User                @relation(fields: [userId], references: [id])
+  userId       String
+  status       IssueStatus         @default(value: UNSOLVED)
+  lat          Float               @default(0) @db.Double
+  lng          Float               @default(0) @db.Double
+  createdAt    DateTime            @default(value: now())
+  issueHistory IssueHistory[]
+  issueComment IssueComment[]
+  image        IssueImage?
+  categories   CategoriesOnIssue[]
+}
+
+model IssueHistory {
   id        Int         @id @default(value: autoincrement())
-  status    IssueStatus @default(value: UNSOLVED)
+  action    IssueStatus
+  issue     Issue       @relation(fields: [issueId], references: [id])
+  issueId   Int
+  user      User        @relation(fields: [userId], references: [id])
+  userId    String
   createdAt DateTime    @default(value: now())
+}
+
+model IssueComment {
+  id        String         @id @default(value: uuid())
+  issue     Issue          @relation(fields: [issueId], references: [id])
+  issueId   Int
+  user      User           @relation(fields: [userId], references: [id])
+  userId    String
+  parent    IssueComment?  @relation("children", fields: [parentId], references: [id])
+  parentId  String?
+  children  IssueComment[] @relation("children")
+  createdAt DateTime       @default(value: now())
+}
+
+model IssueImage {
+  id          Int         @id @default(value: autoincrement())
+  issue       Issue       @relation(fields: [issueId], references: [id])
+  issueId     Int         @unique
+  format      ImageFormat
+  sourceName  String
+  regularName String
+  sourceSize  Int
+  compdSize   Int
+  location    String      @db.LongText
+}
+
+model CategoriesOnIssue {
+  issue      Issue         @relation(fields: [issueId], references: [id])
+  issueId    Int
+  category   IssueCategory @relation(fields: [categoryId], references: [id])
+  categoryId Int
+
+  @@id([issueId, categoryId])
+  @@unique([issueId, categoryId])
+}
+
+model IssueCategory {
+  id       Int                 @id @default(value: autoincrement())
+  name     String              @unique
+  issueBox CategoriesOnIssue[]
 }
 
 enum IssueStatus {
@@ -27,4 +89,17 @@ enum IssueStatus {
   PENDING
   SOLVED
   REPORTED
+}
+
+enum FileType {
+  UNKNOWN
+  IMAGE
+  FILE
+}
+
+enum ImageFormat {
+  PNG
+  JPG
+  JPEG
+  WEBP
 }
