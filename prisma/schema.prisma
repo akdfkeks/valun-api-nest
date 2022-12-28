@@ -22,9 +22,10 @@ model User {
 
 model Issue {
   id           Int                 @id @default(value: autoincrement())
-  user         User                @relation(fields: [userId], references: [id])
-  userId       String
+  user         User?               @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId       String?
   status       IssueStatus         @default(value: UNSOLVED)
+  content      String              @default("") @db.LongText
   lat          Float               @default(0) @db.Double
   lng          Float               @default(0) @db.Double
   createdAt    DateTime            @default(value: now())
@@ -37,20 +38,20 @@ model Issue {
 model IssueHistory {
   id        Int         @id @default(value: autoincrement())
   action    IssueStatus
-  issue     Issue       @relation(fields: [issueId], references: [id])
-  issueId   Int
-  user      User        @relation(fields: [userId], references: [id])
-  userId    String
+  issue     Issue?      @relation(fields: [issueId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  issueId   Int?
+  user      User?       @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId    String?
   createdAt DateTime    @default(value: now())
 }
 
 model IssueComment {
   id        String         @id @default(value: uuid())
-  issue     Issue          @relation(fields: [issueId], references: [id])
+  issue     Issue          @relation(fields: [issueId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   issueId   Int
-  user      User           @relation(fields: [userId], references: [id])
-  userId    String
-  parent    IssueComment?  @relation("children", fields: [parentId], references: [id])
+  user      User?          @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  userId    String?
+  parent    IssueComment?  @relation("children", fields: [parentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   parentId  String?
   children  IssueComment[] @relation("children")
   createdAt DateTime       @default(value: now())
@@ -58,8 +59,8 @@ model IssueComment {
 
 model IssueImage {
   id          Int         @id @default(value: autoincrement())
-  issue       Issue       @relation(fields: [issueId], references: [id])
-  issueId     Int         @unique
+  issue       Issue?      @relation(fields: [issueId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  issueId     Int?        @unique
   format      ImageFormat
   sourceName  String
   regularName String
@@ -69,12 +70,12 @@ model IssueImage {
 }
 
 model CategoriesOnIssue {
-  issue      Issue         @relation(fields: [issueId], references: [id])
+  issue      Issue?        @relation(fields: [issueId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   issueId    Int
-  category   IssueCategory @relation(fields: [categoryId], references: [id])
+  category   IssueCategory @relation(fields: [categoryId], references: [id], onUpdate: Cascade)
   categoryId Int
 
-  @@id([issueId, categoryId])
+  @@id(fields: [issueId, categoryId])
   @@unique([issueId, categoryId])
 }
 
