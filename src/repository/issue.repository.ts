@@ -8,7 +8,20 @@ import {
 
 @Injectable()
 class IssueRepository {
-  constructor(private prisma: PrismaClient) {}
+  withCategories: {};
+  constructor(private prisma: PrismaClient) {
+    this.withCategories = {
+      categories: {
+        include: {
+          category: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+    };
+  }
 
   public async create({}) {
     //const result = await this.prisma.issue.create({ data: {} });
@@ -18,17 +31,7 @@ class IssueRepository {
     try {
       return await this.prisma.issue.findUnique({
         where: { id },
-        include: {
-          categories: {
-            include: {
-              category: {
-                select: {
-                  name: true,
-                },
-              },
-            },
-          },
-        },
+        include: this.withCategories,
       });
     } catch (err) {
       throw new NotFoundException('No Data');
@@ -39,24 +42,14 @@ class IssueRepository {
     try {
       return await this.prisma.issue.findMany({
         where: { userId },
-        include: {
-          categories: {
-            include: {
-              category: {
-                select: {
-                  name: true,
-                },
-              },
-            },
-          },
-        },
+        include: this.withCategories,
       });
     } catch (err) {
       throw new NotFoundException('No Data');
     }
   }
 
-  public async findManyByUserLatLngV1(
+  public async findManyByLatLngV1(
     lat: number,
     lng: number,
     distance: number,
@@ -76,14 +69,31 @@ class IssueRepository {
     } catch (err) {}
   }
 
-  public async findManyByUserLatLngV2(
-    lat: number,
-    lng: number,
-    distance: number,
-  ) {
+  public async findManyByLatLngV2(lat: number, lng: number, distance: number) {
+    const { t, g } = this.getLatLng(distance);
+
     return await this.prisma.issue.findMany({
-      where: {},
+      where: {
+        lat: {
+          lte: lat + t,
+          gte: lat - t,
+        },
+        lng: {
+          lte: lng + g,
+          gte: lng - g,
+        },
+      },
+      include: this.withCategories,
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
+  }
+
+  private getLatLng(distance: number) {
+    const KMPERLAT = 0.00899361453;
+    const KMPERLNG = 0.01126126126;
+    return { t: distance * KMPERLAT, g: distance * KMPERLNG };
   }
 }
 
