@@ -1,51 +1,53 @@
-import { Injectable } from '@nestjs/common';
 import {
-  CategoriesOnIssue,
-  Issue as PIssue,
-  IssueStatus,
-} from '@prisma/client';
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+import { Issue as PIssue } from '@prisma/client';
+import { IIssue, RawIssue } from 'src/dto/issue.dto';
 import IssueRepository from 'src/repository/issue.repository';
+import { StorageService } from './storage.service';
 
 @Injectable()
 export class IssueService {
-  constructor(private issueRepository: IssueRepository) {}
+  constructor(
+    private issueRepository: IssueRepository,
+    private storageService: StorageService,
+  ) {}
 
-  public async findRecentIssues(): Promise<IIssue[] | any[]> {
+  public async createIssue(userId: string, issue: any) {
+    const upload = await this.storageService.upload('image');
+    return await this.issueRepository.create(userId, issue, upload);
+  }
+
+  public async findRecentIssues(): Promise<IIssue[]> {
     return [];
   }
 
-  public async findIssueById(issueId: number): Promise<IIssue | any> {
+  public async findIssueById(issueId: number): Promise<IIssue> {
     const rawIssue = await this.issueRepository.findOneById(issueId);
-    const issue = this.flattenIssueCategory(rawIssue);
+    const issue = this.formatRawIssue(rawIssue);
 
     return issue;
   }
 
-  public async findIssuesByUserId(userId: string): Promise<IIssue[] | any[]> {
+  public async findIssuesByUserId(userId: string): Promise<IIssue[]> {
     const rawIssues = await this.issueRepository.findManyByUserId(userId);
-
-    return [];
+    const issues = rawIssues.map((issue) => this.formatRawIssue(issue));
+    return issues;
   }
 
-  private flattenIssueCategory(rawIssue: TRawIssue): IIssue | any {
-    const { categories, ...rest } = rawIssue;
-    let r: IIssue = {
-      ...rest,
-      categories: [],
-    };
+  private formatRawIssue(rawIssue: RawIssue): IIssue {
+    if (!rawIssue) throw new NotFoundException('그런 이슈는 없어용');
 
-    return r;
+    try {
+      const { issueCategoryId, category, image, ...rest } = rawIssue;
+      const categoryName = category ? category.name : 'Any';
+      const imageUrl = image ? image.location : '기본 이미지 Url';
+
+      return { ...rest, category: categoryName, imageUrl };
+    } catch (err) {
+      throw new InternalServerErrorException('No category');
+    }
   }
-}
-
-type TRawIssue = PIssue & {
-  categories: (CategoriesOnIssue & { category: { name: string } })[];
-};
-
-interface IIssue {
-  id: number;
-  userId: string;
-  categories: string[];
-  status: string;
-  createdAt: Date;
 }

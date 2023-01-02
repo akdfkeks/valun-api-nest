@@ -21,18 +21,19 @@ model User {
 }
 
 model Issue {
-  id           Int                 @id @default(value: autoincrement())
-  user         User?               @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  userId       String?
-  status       IssueStatus         @default(value: UNSOLVED)
-  content      String              @default("") @db.LongText
-  lat          Float               @default(0) @db.Double
-  lng          Float               @default(0) @db.Double
-  createdAt    DateTime            @default(value: now())
-  issueHistory IssueHistory[]
-  issueComment IssueComment[]
-  image        IssueImage?
-  categories   CategoriesOnIssue[]
+  id              Int            @id @default(value: autoincrement())
+  user            User?          @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId          String?
+  status          IssueStatus    @default(value: UNSOLVED)
+  content         String         @default("") @db.LongText
+  lat             Float          @default(0) @db.Double
+  lng             Float          @default(0) @db.Double
+  createdAt       DateTime       @default(value: now())
+  issueHistory    IssueHistory[]
+  issueComment    IssueComment[]
+  image           IssueImage?
+  category        IssueCategory? @relation(fields: [issueCategoryId], references: [id])
+  issueCategoryId Int?
 }
 
 model IssueHistory {
@@ -58,31 +59,21 @@ model IssueComment {
 }
 
 model IssueImage {
-  id          Int         @id @default(value: autoincrement())
-  issue       Issue?      @relation(fields: [issueId], references: [id], onUpdate: Cascade, onDelete: SetNull)
-  issueId     Int?        @unique
-  format      ImageFormat
+  id          Int    @id @default(value: autoincrement())
+  issue       Issue? @relation(fields: [issueId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  issueId     Int?   @unique
+  format      String
   sourceName  String
   regularName String
   sourceSize  Int
   compdSize   Int
-  location    String      @db.LongText
-}
-
-model CategoriesOnIssue {
-  issue      Issue?        @relation(fields: [issueId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  issueId    Int
-  category   IssueCategory @relation(fields: [categoryId], references: [id], onUpdate: Cascade)
-  categoryId Int
-
-  @@id(fields: [issueId, categoryId])
-  @@unique([issueId, categoryId])
+  location    String @db.LongText
 }
 
 model IssueCategory {
-  id       Int                 @id @default(value: autoincrement())
-  name     String              @unique
-  issueBox CategoriesOnIssue[]
+  id    Int     @id @default(value: autoincrement())
+  name  String  @unique
+  Issue Issue[]
 }
 
 enum IssueStatus {
@@ -96,11 +87,4 @@ enum FileType {
   UNKNOWN
   IMAGE
   FILE
-}
-
-enum ImageFormat {
-  PNG
-  JPG
-  JPEG
-  WEBP
 }
