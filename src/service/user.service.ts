@@ -1,13 +1,31 @@
 import { Injectable } from '@nestjs/common';
+import { argon2i, hash, verify } from 'argon2';
+import { CreateUserDto } from 'src/dto/user.dto';
 import UserRepository from '../repository/user.repository';
 
 @Injectable()
 export class UserService {
   constructor(private userRepository: UserRepository) {}
 
-  async findUniqueUser(id: string) {
-    const user = await this.userRepository.findById(id);
+  async signUp(userDto: CreateUserDto) {
+    const hashed = await this.hashPw(userDto.pw);
+    return await this.userRepository.create({
+      id: userDto.id,
+      pw: hashed,
+      name: userDto.name,
+      nick: userDto.nick,
+    });
+  }
 
-    return user;
+  async findUniqueUser(id: string) {
+    return await this.userRepository.findById(id);
+  }
+
+  private async hashPw(plain: string) {
+    return await hash(plain, { type: argon2i });
+  }
+
+  private async verifyPw(plain: string, hashed: string) {
+    return await verify(plain, hashed, { type: argon2i });
   }
 }

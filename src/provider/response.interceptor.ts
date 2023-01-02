@@ -8,8 +8,8 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export interface Response<T> {
-  statusCode: number;
-  message: string;
+  // statusCode: number;
+  // message: string;
   data: T;
 }
 
@@ -20,11 +20,14 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
     next: CallHandler,
   ): Observable<Response<T>> {
     return next.handle().pipe(
-      map((data) => ({
-        statusCode: context.switchToHttp().getResponse().statusCode,
-        message: data.message || '',
-        data: data || '',
-      })),
+      map((result, index) => {
+        // console.log(result);
+        return {
+          // statusCode: context.switchToHttp().getResponse().statusCode,
+          // message: result.message || '',
+          data: result.data || '',
+        };
+      }),
     );
   }
 }

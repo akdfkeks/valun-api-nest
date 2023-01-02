@@ -16,7 +16,8 @@ export class AuthService {
 
   async validateUser(id: string, pw: string): Promise<any> {
     const user = await this.userService.findUniqueUser(id);
-    if (user && user.pw === pw) {
+    if (user) {
+      // 비밀번호 검증
       const { pw, ...result } = user;
       return result;
     }
