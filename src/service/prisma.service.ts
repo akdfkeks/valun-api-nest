@@ -38,6 +38,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   }
 
   private toKST(datetime: Date) {
-    return dayjs(datetime).add(9, 'hours').toJSON();
+    // return dayjs(datetime).add(9, 'hours').toJSON();
+    // return dayjs.tz(datetime.to, 'Asia/Seoul').toJSON();
+    return dayjs(
+      datetime.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }),
+    ).format('YYYY-MM-DD HH:mm:ss');
   }
 }
