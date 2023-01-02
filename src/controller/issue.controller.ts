@@ -34,7 +34,7 @@ export class IssueController {
   async getIssueById(@Param('id', new ParseIntPipe()) id: number) {
     const issue = await this.issueService.findIssueById(id);
     return {
-      message: `Single issue with ID ${id}`,
+      message: `Issue with ID of ${id}`,
       data: issue,
     };
   }
