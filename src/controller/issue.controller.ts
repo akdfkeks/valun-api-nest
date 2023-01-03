@@ -19,6 +19,10 @@ export class IssueController {
   constructor(private issueService: IssueService) {}
 
   @UseGuards(StrictJwtGuard)
+  @Post(':id/solve')
+  async solveIssue(@Param('id', new ParseIntPipe()) id: number) {}
+
+  @UseGuards(StrictJwtGuard)
   @Post('')
   async postIssue(@Req() req: Request, @Body() issue: CreateIssueDto) {
     const created = await this.issueService.createIssue(req.user, issue);
