@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateImageDto } from 'src/dto/image.dto';
-import { CreateIssueDto, RawIssue } from 'src/dto/issue.dto';
+import { PostIssueDto, RawIssue } from 'src/dto/issue.dto';
 import { PrismaService } from 'src/service/prisma.service';
 
 @Injectable()
@@ -27,7 +27,7 @@ class IssueRepository {
 
   public async create(
     userId: string,
-    issueDto: CreateIssueDto,
+    issueDto: PostIssueDto,
     imageDto: CreateImageDto,
   ) {
     try {

@@ -1,9 +1,24 @@
 import { Issue as PIssue } from '@prisma/client';
+import { Transform } from 'class-transformer';
+import { IsArray, IsNumber } from 'class-validator';
 
-export interface CreateIssueDto {
+export class PostIssueDto {
   description: string;
   category: string;
   lat: number;
+  lng: number;
+}
+
+export class GetIssuesDto {
+  @IsArray()
+  categories: string[];
+
+  @IsNumber()
+  @Transform(({ value }) => parseFloat(value))
+  lat: number;
+
+  @IsNumber()
+  @Transform(({ value }) => parseFloat(value))
   lng: number;
 }
 
