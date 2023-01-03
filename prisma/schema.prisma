@@ -16,34 +16,37 @@ model User {
   broom        Int            @default(value: 0)
   createdAt    DateTime       @default(value: now())
   issueComment IssueComment[]
-  issueHistory IssueHistory[]
   Issue        Issue[]
+  Solve        Solve[]
 }
 
 model Issue {
   id              Int            @id @default(value: autoincrement())
-  user            User?          @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  user            User?          @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: SetNull)
   userId          String?
   status          IssueStatus    @default(value: UNSOLVED)
-  content         String         @default("") @db.LongText
+  description     String         @default("") @db.LongText
   lat             Float          @default(0) @db.Double
   lng             Float          @default(0) @db.Double
   createdAt       DateTime       @default(value: now())
-  issueHistory    IssueHistory[]
   issueComment    IssueComment[]
   image           IssueImage?
   category        IssueCategory? @relation(fields: [issueCategoryId], references: [id])
   issueCategoryId Int?
+  solve           Solve[]
 }
 
-model IssueHistory {
-  id        Int         @id @default(value: autoincrement())
-  action    IssueStatus
-  issue     Issue?      @relation(fields: [issueId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  issueId   Int?
-  user      User?       @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  userId    String?
-  createdAt DateTime    @default(value: now())
+model Solve {
+  id          Int         @id @default(value: autoincrement())
+  user        User?       @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  userId      String?
+  description String      @default("") @db.LongText
+  lat         Float       @default(0) @db.Double
+  lng         Float       @default(0) @db.Double
+  createdAt   DateTime    @default(value: now())
+  issue       Issue       @relation(fields: [issueId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  issueId     Int
+  image       SolveImage?
 }
 
 model IssueComment {
@@ -62,6 +65,18 @@ model IssueImage {
   id          Int    @id @default(value: autoincrement())
   issue       Issue? @relation(fields: [issueId], references: [id], onUpdate: Cascade, onDelete: SetNull)
   issueId     Int?   @unique
+  format      String
+  sourceName  String
+  regularName String
+  sourceSize  Int
+  compdSize   Int
+  location    String @db.LongText
+}
+
+model SolveImage {
+  id          Int    @id @default(value: autoincrement())
+  solve       Solve? @relation(fields: [solveId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  solveId     Int?   @unique
   format      String
   sourceName  String
   regularName String

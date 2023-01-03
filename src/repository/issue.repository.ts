@@ -44,7 +44,7 @@ class IssueRepository {
               create: { name: issueDto.category },
             },
           },
-          content: issueDto.content,
+          description: issueDto.description,
           lat: issueDto.lat,
           lng: issueDto.lng,
           image: {
@@ -53,52 +53,40 @@ class IssueRepository {
         },
       });
     } catch (err) {
-      console.log(err);
       throw new InternalServerErrorException(err);
     }
   }
 
   public async findOneById(id: number): Promise<RawIssue> {
-    try {
-      const r = await this.prisma.issue.findUnique({
-        where: { id },
-        include: this.includeCategory,
-      });
-      return r;
-    } catch (err) {
-      throw new NotFoundException('No Data');
-    }
+    return await this.prisma.issue.findUnique({
+      where: { id },
+      include: this.includeCategory,
+    });
   }
 
   public async findManyByUserId(userId: string): Promise<RawIssue[]> {
-    try {
-      return await this.prisma.issue.findMany({
-        where: { userId },
-        include: this.includeCategory,
-      });
-    } catch (err) {
-      throw new NotFoundException('No Data');
-    }
+    return await this.prisma.issue.findMany({
+      where: { userId },
+      include: this.includeCategory,
+    });
   }
 
-  public async findManyByLatLngV1(
+  public async findManyInCircleByLatLng(
     lat: number,
     lng: number,
     distance: number,
   ): Promise<RawIssue[]> {
-    try {
-      return await this.prisma.$queryRaw`
+    return await this.prisma.$queryRaw`
 				SELECT *,
 				(6371*acos(cos(radians(${lat}))*cos(radians(lat))*cos(radians(lng)-radians(${lng}))+sin(radians(${lat}))*sin(radians(lat)))) AS dist
 				FROM Issue
 				HAVING dist <= ${distance}
 				ORDER BY dist 
 				`;
-      // order by createdAt 추가하기
-    } catch (err) {}
+    // order by createdAt 추가하기
   }
 
-  public async findManyByLatLngV2(
+  public async findManyInSquareByLatLng(
     lat: number,
     lng: number,
     distance: number,

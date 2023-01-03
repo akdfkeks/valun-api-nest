@@ -1,7 +1,7 @@
 import { Issue as PIssue } from '@prisma/client';
 
 export interface CreateIssueDto {
-  content: string;
+  description: string;
   category: string;
   lat: number;
   lng: number;
@@ -12,7 +12,7 @@ export interface IIssue {
   userId: string;
   status: string;
   category: string;
-  content: string;
+  description: string;
   lat: number;
   lng: number;
   createdAt: Date;

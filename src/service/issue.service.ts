@@ -25,10 +25,13 @@ export class IssueService {
   }
 
   public async findIssueById(
+    userId: string,
     issueId: number,
-    userId?: string,
   ): Promise<IIssue & { isMine: boolean }> {
     const rawIssue = await this.issueRepository.findOneById(issueId);
+
+    if (!rawIssue) throw new NotFoundException('그런 이슈는 없어용');
+
     const issue = this.formatRawIssue(rawIssue, userId);
 
     return issue;
@@ -44,8 +47,6 @@ export class IssueService {
     rawIssue: RawIssue,
     userId: string,
   ): IIssue & { isMine: boolean } {
-    if (!rawIssue) throw new NotFoundException('그런 이슈는 없어용');
-
     try {
       const { issueCategoryId, category, image, ...rest } = rawIssue;
       const categoryName = category ? category.name : 'Any';

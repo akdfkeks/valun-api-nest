@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './module/app.module';
 import { HttpExceptionFilter } from './provider/filter/http-global.filter';
 import { UnExpectedExceptionFilter } from './provider/filter/unexpected-global.filter';
-import { ResponseInterceptor } from './provider/response.interceptor';
+import { ResponseInterceptor } from './provider/interceptor/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,17 +13,17 @@ async function bootstrap() {
     new HttpExceptionFilter(), // It works first
   );
 
-  app.useGlobalInterceptors(new ResponseInterceptor());
-
   app.useGlobalPipes(
     new ValidationPipe({
-      transform: true,
       stopAtFirstError: true,
+      transform: true,
       whitelist: true,
       forbidNonWhitelisted: true,
       forbidUnknownValues: true,
     }),
   );
+
+  app.useGlobalInterceptors(new ResponseInterceptor());
 
   await app.listen(3000);
 }

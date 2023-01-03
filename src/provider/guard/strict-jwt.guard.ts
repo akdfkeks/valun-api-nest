@@ -8,13 +8,7 @@ import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class StrictJwtGuard implements CanActivate {
-  private anonymous: boolean;
-  constructor(
-    private readonly reflector: Reflector,
-    options: { anonymous?: boolean },
-  ) {
-    this.anonymous = options.anonymous;
-  }
+  constructor(private readonly reflector: Reflector) {}
 
   public canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest();

@@ -1,14 +1,21 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { AuthMiddleware } from 'src/provider/middleware/auth.middleware';
 import { AppController } from '../controller/app.controller';
 import { AppService } from '../service/app.service';
 import { AuthModule } from './auth.module';
 import { IssueModule } from './issue.module';
-import { PrismaModule } from './prisma.module';
+import { GlobalModule } from './global.module';
 import { UserModule } from './user.module';
 
 @Module({
-  imports: [AuthModule, UserModule, PrismaModule, IssueModule],
+  imports: [AuthModule, UserModule, IssueModule, GlobalModule],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL });
+  }
+}

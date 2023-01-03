@@ -11,10 +11,12 @@ export class UnExpectedExceptionFilter implements ExceptionFilter {
 
     // const context = host.switchToHttp();
     const res = host.switchToHttp().getResponse<Response>();
-    const data = { error: name, timestamp: new Date().toISOString() };
+    const error = {
+      code: statusCode,
+      message,
+      timestamp: new Date().toISOString(),
+    };
 
-    res
-      .status(statusCode)
-      .json({ statusCode, message: 'Internal Server Error', data });
+    res.status(statusCode).json({ message: 'Internal Server Error', error });
   }
 }

@@ -11,7 +11,7 @@ export class AuthService {
   ) {}
 
   async login(user: UserLoginDto) {
-    const payload = this.validateUser(user.id, user.pw);
+    const payload = await this.validateUser(user.id, user.pw);
     return this.jwtService.sign(payload);
   }
 
@@ -20,11 +20,11 @@ export class AuthService {
 
     if (!user) throw new UnauthorizedException('존재하지 않는 회원입니다.');
 
-    const { pw, ...result } = user;
+    const { pw, id, nick, broom, ...result } = user;
     // 비밀번호 검증
     if (!pw) throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
 
-    return result;
+    return { id, nick, broom };
   }
 
   public async validateJwt(token: string): Promise<string> {
