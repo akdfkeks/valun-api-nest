@@ -30,9 +30,13 @@ export class IssueController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async getIssueById(@Param('id', new ParseIntPipe()) id: number) {
-    const issue = await this.issueService.findIssueById(id);
+  async getIssueById(
+    @Param('id', new ParseIntPipe()) id: number,
+    @Req() req: Request,
+  ) {
+    const issue = await this.issueService.findIssueById(id, req.user.userId);
     return {
       message: `Issue with ID of ${id}`,
       data: issue,

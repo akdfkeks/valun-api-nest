@@ -24,28 +24,34 @@ export class IssueService {
     return [];
   }
 
-  public async findIssueById(issueId: number): Promise<IIssue> {
+  public async findIssueById(
+    issueId: number,
+    userId?: string,
+  ): Promise<IIssue & { isMine: boolean }> {
     const rawIssue = await this.issueRepository.findOneById(issueId);
-    const issue = this.formatRawIssue(rawIssue);
+    const issue = this.formatRawIssue(rawIssue, userId);
 
     return issue;
   }
 
   public async findIssuesByUserId(userId: string): Promise<IIssue[]> {
     const rawIssues = await this.issueRepository.findManyByUserId(userId);
-    const issues = rawIssues.map((issue) => this.formatRawIssue(issue));
+    const issues = rawIssues.map((issue) => this.formatRawIssue(issue, userId));
     return issues;
   }
 
-  private formatRawIssue(rawIssue: RawIssue): IIssue {
+  private formatRawIssue(
+    rawIssue: RawIssue,
+    userId: string,
+  ): IIssue & { isMine: boolean } {
     if (!rawIssue) throw new NotFoundException('그런 이슈는 없어용');
 
     try {
       const { issueCategoryId, category, image, ...rest } = rawIssue;
       const categoryName = category ? category.name : 'Any';
       const imageUrl = image ? image.location : '기본 이미지 Url';
-
-      return { ...rest, category: categoryName, imageUrl };
+      const isMine = userId == rawIssue.userId ? true : false;
+      return { ...rest, category: categoryName, imageUrl, isMine };
     } catch (err) {
       throw new InternalServerErrorException('No category');
     }
