@@ -17,7 +17,7 @@ model User {
   createdAt    DateTime       @default(value: now())
   issueComment IssueComment[]
   Issue        Issue[]
-  Solve        Solve[]
+  Solve        Solution[]
 }
 
 model Issue {
@@ -33,10 +33,10 @@ model Issue {
   image           IssueImage?
   category        IssueCategory? @relation(fields: [issueCategoryId], references: [id])
   issueCategoryId Int?
-  solve           Solve[]
+  solve           Solution[]
 }
 
-model Solve {
+model Solution {
   id          Int         @id @default(value: autoincrement())
   user        User?       @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: SetNull)
   userId      String?
@@ -74,15 +74,15 @@ model IssueImage {
 }
 
 model SolveImage {
-  id          Int    @id @default(value: autoincrement())
-  solve       Solve? @relation(fields: [solveId], references: [id], onUpdate: Cascade, onDelete: SetNull)
-  solveId     Int?   @unique
+  id          Int       @id @default(value: autoincrement())
+  solve       Solution? @relation(fields: [solveId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  solveId     Int?      @unique
   format      String
   sourceName  String
   regularName String
   sourceSize  Int
   compdSize   Int
-  location    String @db.LongText
+  location    String    @db.LongText
 }
 
 model IssueCategory {
