@@ -4,6 +4,9 @@ import * as dayjs from 'dayjs';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
+  constructor() {
+    super({ log: [{ emit: 'event', level: 'query' }] });
+  }
   async onModuleInit() {
     await this.$connect();
 
@@ -11,22 +14,16 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     /*** TIME ZONE MIDDLEWARE ***/
     /****************************/
     await this.$use(async (params, next) => {
+      if (params.model !== 'Issue') return next(params);
+
       const result = await next(params);
-      if (
-        (params.model == 'Issue' && params.action == 'findMany') ||
-        params.action == 'findUnique' ||
-        params.action == 'findRaw'
-      ) {
-        try {
-          if (result && result.createdAt) {
-            // console.log(result);
-            const kst = this.toKST(result.createdAt);
-            result.createdAt = kst;
-          }
-        } catch (err) {
-          console.log(err);
-        }
-      }
+      if (params.action == 'findMany')
+        return result.map((issue) => {
+          issue.createdAt = this.toKST(issue.createdAt);
+          return issue;
+        });
+
+      result.createdAt = this.toKST(result.createdAt);
       return result;
     });
   }
@@ -38,10 +35,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   }
 
   private toKST(datetime: Date) {
-    // return dayjs(datetime).add(9, 'hours').toJSON();
-    // return dayjs.tz(datetime.to, 'Asia/Seoul').toJSON();
-    return dayjs(
-      datetime.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }),
-    ).format('YYYY-MM-DD HH:mm:ss');
+    // console.log(datetime);
+    const d = dayjs(datetime).add(9, 'hours').toISOString().split('Z')[0];
+
+    return d;
+    // return dayjs(datetime).add(9, 'hours').format('YYYY-MM-DD HH:mm:ss');
   }
 }

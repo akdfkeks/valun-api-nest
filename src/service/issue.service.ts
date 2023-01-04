@@ -24,17 +24,38 @@ export class IssueService {
     return [];
   }
 
-  public async findIssueById(
+  public async findAllIssues(
     userId: string,
-    issueId: number,
-  ): Promise<IIssue & { isMine: boolean }> {
+    lat: number = undefined,
+    lng: number = undefined,
+    categories: string[] = undefined,
+    count: number = undefined,
+  ) {
+    const DISTANCE = 500; //임시: 조회 반경
+    const rawIssues = await this.issueRepository.findManyInSquareByLatLng(
+      lat,
+      lng,
+      DISTANCE,
+      categories,
+      count,
+    );
+    if (rawIssues.length == 0) return [];
+
+    const iIssues = rawIssues.map((issue) =>
+      this.formatRawIssue(issue, userId),
+    );
+
+    return { message: '사용자 주변 이슈 목록', data: { issues: iIssues } };
+  }
+
+  public async findIssueById(userId: string, issueId: number) {
     const rawIssue = await this.issueRepository.findOneById(issueId);
 
     if (!rawIssue) throw new NotFoundException('그런 이슈는 없어용');
 
     const issue = this.formatRawIssue(rawIssue, userId);
 
-    return issue;
+    return { message: '단일 이슈', data: { issue } };
   }
 
   public async findIssuesByUserId(userId: string): Promise<IIssue[]> {
@@ -54,7 +75,7 @@ export class IssueService {
       const isMine = userId == rawIssue.userId ? true : false;
       return { ...rest, category: categoryName, imageUrl, isMine };
     } catch (err) {
-      throw new InternalServerErrorException('No category');
+      throw new InternalServerErrorException("Can't format issue");
     }
   }
 }

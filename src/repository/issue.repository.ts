@@ -9,18 +9,22 @@ import { PrismaService } from 'src/service/prisma.service';
 
 @Injectable()
 class IssueRepository {
-  private includeCategory: {
-    category: { select: { name: boolean } };
-    image: { select: { location: boolean } };
+  private includeCategoryAndImage: {
+    include: {
+      category: { select: { name: boolean } };
+      image: { select: { location: boolean } };
+    };
   };
 
   constructor(private prisma: PrismaService) {
-    this.includeCategory = {
-      category: {
-        select: { name: true },
-      },
-      image: {
-        select: { location: true },
+    this.includeCategoryAndImage = {
+      include: {
+        category: {
+          select: { name: true },
+        },
+        image: {
+          select: { location: true },
+        },
       },
     };
   }
@@ -60,14 +64,14 @@ class IssueRepository {
   public async findOneById(id: number): Promise<RawIssue> {
     return await this.prisma.issue.findUnique({
       where: { id },
-      include: this.includeCategory,
+      ...this.includeCategoryAndImage,
     });
   }
 
   public async findManyByUserId(userId: string): Promise<RawIssue[]> {
     return await this.prisma.issue.findMany({
       where: { userId },
-      include: this.includeCategory,
+      ...this.includeCategoryAndImage,
     });
   }
 
@@ -90,6 +94,8 @@ class IssueRepository {
     lat: number,
     lng: number,
     distance: number,
+    categories: string[],
+    count: number,
   ): Promise<RawIssue[]> {
     const { t, g } = this.distToLatLng(distance);
 
@@ -103,11 +109,17 @@ class IssueRepository {
           lte: lng + g,
           gte: lng - g,
         },
+        // category: {
+        //   name: {
+        //     in: categories,
+        //   },
+        // },
       },
-      include: this.includeCategory,
+      ...this.includeCategoryAndImage,
       orderBy: {
         createdAt: 'desc',
       },
+      take: count,
     });
   }
 

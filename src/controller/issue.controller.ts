@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  Injectable,
   Param,
   ParseIntPipe,
   Post,
@@ -11,7 +10,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { GetIssuesDto, PostIssueDto } from 'src/dto/issue.dto';
+import {
+  GetAllIssuesDto,
+  GetRecentIssuesDto,
+  PostIssueDto,
+} from 'src/dto/issue.dto';
 import { CreateSolutionDto } from 'src/dto/solution.dto';
 import { StrictJwtGuard } from 'src/provider/guard/strict-jwt.guard';
 import { IssueService } from 'src/service/issue.service';
@@ -66,6 +69,22 @@ export class IssueController {
       data: {},
     };
   }
+  // 최근 이슈 목록 조회 - Query : [lat, lng, categories]
+  @UseGuards(StrictJwtGuard)
+  @Get('/recent')
+  async getRecentIssues(
+    @Query() getRecentIssuesDto: GetRecentIssuesDto,
+    @Req() req: Request,
+  ) {
+    const { categories, lat, lng } = getRecentIssuesDto;
+    return await this.issueService.findAllIssues(
+      req.user,
+      lat,
+      lng,
+      categories,
+      3,
+    );
+  }
 
   @UseGuards(StrictJwtGuard)
   @Get(':id')
@@ -73,14 +92,22 @@ export class IssueController {
     @Param('id', new ParseIntPipe()) id: number,
     @Req() req: Request,
   ) {
-    const issue = await this.issueService.findIssueById(req.user, id);
-    return {
-      message: `Issue with ID of ${id}`,
-      data: issue,
-    };
+    return await this.issueService.findIssueById(req.user, id);
   }
 
+  // 이슈 목록 조회 - Query : [lat, lng, categories]
   @UseGuards(StrictJwtGuard)
   @Get('')
-  async getIssues(@Query() issues: GetIssuesDto) {}
+  async getAllIssues(
+    @Query() getIssuesDto: GetAllIssuesDto,
+    @Req() req: Request,
+  ) {
+    const { categories, lat, lng } = getIssuesDto;
+    return await this.issueService.findAllIssues(
+      req.user,
+      lat,
+      lng,
+      categories,
+    );
+  }
 }
