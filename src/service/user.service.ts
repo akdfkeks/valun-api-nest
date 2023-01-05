@@ -12,7 +12,6 @@ export class UserService {
     return await this.userRepository.create({
       id: userDto.id,
       pw: hashed,
-      name: userDto.name,
       nick: userDto.nick,
     });
   }

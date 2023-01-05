@@ -17,6 +17,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       if (params.model !== 'Issue') return next(params);
 
       const result = await next(params);
+      if (!result) return result;
+
       if (params.action == 'findMany')
         return result.map((issue) => {
           issue.createdAt = this.toKST(issue.createdAt);

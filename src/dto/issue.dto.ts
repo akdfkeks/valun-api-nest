@@ -45,7 +45,7 @@ export class PostIssueDto {
   @IsNotEmpty()
   lat: number;
 
-  @IsLatitude()
+  @IsLongitude()
   @Transform(({ value }) => parseFloat(value))
   @IsNotEmpty()
   lng: number;

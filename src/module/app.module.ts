@@ -14,6 +14,7 @@ import { UserModule } from './user.module';
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
+    // consumer.apply(LoggerMiddleware).forRoutes('*');
     consumer
       .apply(AuthMiddleware)
       .forRoutes({ path: '*', method: RequestMethod.ALL });

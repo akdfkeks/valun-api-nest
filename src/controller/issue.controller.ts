@@ -7,8 +7,11 @@ import {
   Post,
   Query,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import { GetIssuesDto, GetIssueQuery, PostIssueDto } from 'src/dto/issue.dto';
 import { PostSolutionDto } from 'src/dto/solution.dto';
@@ -56,13 +59,21 @@ export class IssueController {
     @Body() solution: PostSolutionDto,
   ) {}
 
+  @UseInterceptors(FileInterceptor('image'))
   @UseGuards(StrictJwtGuard)
   @Post('')
-  async postIssue(@Req() req: Request, @Body() issue: PostIssueDto) {
-    const created = await this.issueService.createIssue(req.user, issue);
+  async postIssue(
+    @Req() req: Request,
+    @Body() issue: PostIssueDto,
+    @UploadedFile() image: Express.Multer.File = null,
+  ) {
+    const created = await this.issueService.createIssue(req.user, issue, image);
     return {
       message: '이슈를 등록하였습니다.',
-      data: {},
+      data: {
+        id: created.id,
+        createdAt: created.createdAt,
+      },
     };
   }
   // 최근 이슈 목록 조회

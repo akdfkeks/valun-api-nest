@@ -20,8 +20,12 @@ export class IssueService {
     private storageService: StorageService,
   ) {}
 
-  public async createIssue(userId: string, issue: any) {
-    const upload = await this.storageService.upload('image');
+  public async createIssue(
+    userId: string,
+    issue: any,
+    image: Express.Multer.File,
+  ) {
+    const upload = await this.storageService.upload(image);
     return await this.issueRepository.create(userId, issue, upload);
   }
 
