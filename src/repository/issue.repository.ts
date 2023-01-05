@@ -3,8 +3,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateImageDto } from 'src/dto/image.dto';
-import { PostIssueDto, IExtendedRawIssue } from 'src/dto/issue.dto';
+import { CreateImageDto } from 'src/interface/dto/image.dto';
+import { PostIssueDto, IExtendedRawIssue } from 'src/interface/dto/issue.dto';
 import { PrismaService } from 'src/service/prisma.service';
 
 @Injectable()

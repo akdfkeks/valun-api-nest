@@ -6,7 +6,7 @@ import {
   Post,
   Body,
 } from '@nestjs/common';
-import { CreateUserDto } from 'src/dto/user.dto';
+import { CreateUserDto } from 'src/interface/dto/user.dto';
 import { StrictJwtGuard } from 'src/provider/guard/strict-jwt.guard';
 import { UserService } from 'src/service/user.service';
 

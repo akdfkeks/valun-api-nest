@@ -9,7 +9,7 @@ import {
   IExtendedIssue,
   IExtendedRawIssue,
   GetIssueQuery,
-} from 'src/dto/issue.dto';
+} from 'src/interface/dto/issue.dto';
 import IssueRepository from 'src/repository/issue.repository';
 import { StorageService } from './storage.service';
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { argon2i, hash, verify } from 'argon2';
-import { CreateUserDto } from 'src/dto/user.dto';
+import { CreateUserDto } from 'src/interface/dto/user.dto';
 import UserRepository from '../repository/user.repository';
 
 @Injectable()

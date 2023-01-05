@@ -2,10 +2,9 @@ import { utilities, WinstonModule } from 'nest-winston';
 import * as winstonDaily from 'winston-daily-rotate-file';
 import * as winston from 'winston';
 
-const env = process.env.NODE_ENV;
 const logDir = __dirname + '/../../logs'; // log 파일을 관리할 폴더
 
-// rfc5424를 따르는 winston만의 log level
+// RFC5424
 // error: 0, warn: 1, info: 2, http: 3, verbose: 4, debug: 5, silly: 6
 const dailyOptions = (level: string) => {
   return {
@@ -21,20 +20,14 @@ const dailyOptions = (level: string) => {
 export const winstonLogger = WinstonModule.createLogger({
   transports: [
     new winston.transports.Console({
-      // level: env === 'production' ? 'http' : 'silly',
-      // production 환경이라면 http, 개발환경이라면 모든 단계를 로그
       level: 'silly',
-      format:
-        // env === 'production'
-        //   ? // production 환경은 자원을 아끼기 위해 simple 포맷 사용
-        //     winston.format.simple()
-        // :
-        winston.format.combine(
-          winston.format.timestamp(),
-          utilities.format.nestLike('Valun', {
-            prettyPrint: true, // nest에서 제공하는 옵션. 로그 가독성을 높여줌
-          }),
-        ),
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        utilities.format.nestLike('Valun', {
+          colors: true,
+          prettyPrint: true, // nest에서 제공하는 옵션. 로그 가독성을 높여줌
+        }),
+      ),
     }),
 
     // info, warn, error 로그는 파일로 관리
