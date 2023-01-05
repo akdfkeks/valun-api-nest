@@ -8,12 +8,6 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() user: UserLoginDto) {
-    const login = await this.authService.login(user);
-    return {
-      message: '로그인에 성공하였습니다.',
-      data: {
-        accessToken: login,
-      },
-    };
+    return await this.authService.login(user);
   }
 }
