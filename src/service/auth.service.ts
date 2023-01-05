@@ -12,7 +12,13 @@ export class AuthService {
 
   async login(user: UserLoginDto) {
     const payload = await this.validateUser(user.id, user.pw);
-    return this.jwtService.sign(payload);
+    const login = this.jwtService.sign(payload);
+    return {
+      message: '로그인에 성공하였습니다.',
+      data: {
+        accessToken: login,
+      },
+    };
   }
 
   private async validateUser(reqId: string, reqPw: string): Promise<any> {

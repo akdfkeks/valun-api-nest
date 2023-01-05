@@ -10,12 +10,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Request } from 'express';
-import {
-  GetAllIssuesDto,
-  GetRecentIssuesDto,
-  PostIssueDto,
-} from 'src/dto/issue.dto';
-import { CreateSolutionDto } from 'src/dto/solution.dto';
+import { GetIssuesDto, GetIssueQuery, PostIssueDto } from 'src/dto/issue.dto';
+import { PostSolutionDto } from 'src/dto/solution.dto';
 import { StrictJwtGuard } from 'src/provider/guard/strict-jwt.guard';
 import { IssueService } from 'src/service/issue.service';
 
@@ -57,7 +53,7 @@ export class IssueController {
   @Post(':id/solve')
   async postIssueSolution(
     @Param('id', new ParseIntPipe()) id: number,
-    @Body() solution: CreateSolutionDto,
+    @Body() solution: PostSolutionDto,
   ) {}
 
   @UseGuards(StrictJwtGuard)
@@ -69,45 +65,39 @@ export class IssueController {
       data: {},
     };
   }
-  // 최근 이슈 목록 조회 - Query : [lat, lng, categories]
+  // 최근 이슈 목록 조회
   @UseGuards(StrictJwtGuard)
-  @Get('/recent')
+  @Get('recent')
   async getRecentIssues(
-    @Query() getRecentIssuesDto: GetRecentIssuesDto,
     @Req() req: Request,
+    @Query() getRecentIssuesDto: GetIssuesDto,
   ) {
-    const { categories, lat, lng } = getRecentIssuesDto;
+    getRecentIssuesDto.categories = undefined;
     return await this.issueService.findAllIssues(
       req.user,
-      lat,
-      lng,
-      categories,
-      3,
+      getRecentIssuesDto,
+      5,
     );
   }
 
-  @UseGuards(StrictJwtGuard)
   @Get(':id')
   async getIssue(
-    @Param('id', new ParseIntPipe()) id: number,
     @Req() req: Request,
+    @Param('id', new ParseIntPipe()) id: number,
+    // @Query() field: GetIssueQuery = undefined,
   ) {
     return await this.issueService.findIssueById(req.user, id);
   }
 
-  // 이슈 목록 조회 - Query : [lat, lng, categories]
-  @UseGuards(StrictJwtGuard)
+  // 주변 이슈 목록 조회
   @Get('')
-  async getAllIssues(
-    @Query() getIssuesDto: GetAllIssuesDto,
-    @Req() req: Request,
-  ) {
-    const { categories, lat, lng } = getIssuesDto;
-    return await this.issueService.findAllIssues(
-      req.user,
-      lat,
-      lng,
-      categories,
-    );
+  async getAllIssues(@Query() getIssuesDto: GetIssuesDto, @Req() req: Request) {
+    // Temp
+    let newArr = getIssuesDto.categories.filter((element) => {
+      return element !== undefined && element !== null && element !== '';
+    });
+    getIssuesDto.categories = newArr.length == 0 ? undefined : newArr;
+
+    return await this.issueService.findAllIssues(req.user, getIssuesDto);
   }
 }

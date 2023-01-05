@@ -4,7 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Issue as PIssue } from '@prisma/client';
-import { IIssue, RawIssue } from 'src/dto/issue.dto';
+import {
+  GetIssuesDto,
+  IExtendedIssue,
+  IExtendedRawIssue,
+  GetIssueQuery,
+} from 'src/dto/issue.dto';
 import IssueRepository from 'src/repository/issue.repository';
 import { StorageService } from './storage.service';
 
@@ -20,62 +25,64 @@ export class IssueService {
     return await this.issueRepository.create(userId, issue, upload);
   }
 
-  public async findRecentIssues(): Promise<IIssue[]> {
-    return [];
-  }
-
   public async findAllIssues(
     userId: string,
-    lat: number = undefined,
-    lng: number = undefined,
-    categories: string[] = undefined,
+    getIssuesDto: GetIssuesDto,
     count: number = undefined,
   ) {
-    const DISTANCE = 500; //임시: 조회 반경
+    const DISTANCE = 500; //임시: 조회 반경 (km)
     const rawIssues = await this.issueRepository.findManyInSquareByLatLng(
-      lat,
-      lng,
+      getIssuesDto.lat,
+      getIssuesDto.lng,
       DISTANCE,
-      categories,
+      getIssuesDto.categories,
       count,
     );
     if (rawIssues.length == 0) return [];
 
     const iIssues = rawIssues.map((issue) =>
-      this.formatRawIssue(issue, userId),
+      this.formatRawIssue(userId, issue),
     );
 
     return { message: '사용자 주변 이슈 목록', data: { issues: iIssues } };
   }
 
-  public async findIssueById(userId: string, issueId: number) {
+  public async findIssueById(
+    userId: string,
+    issueId: number,
+    field?: GetIssueQuery,
+  ) {
     const rawIssue = await this.issueRepository.findOneById(issueId);
-
     if (!rawIssue) throw new NotFoundException('그런 이슈는 없어용');
 
-    const issue = this.formatRawIssue(rawIssue, userId);
+    const issue = this.formatRawIssue(userId, rawIssue);
 
     return { message: '단일 이슈', data: { issue } };
   }
 
-  public async findIssuesByUserId(userId: string): Promise<IIssue[]> {
+  public async findIssuesByUserId(userId: string) {
+    let issues: IExtendedIssue[] = [];
+
     const rawIssues = await this.issueRepository.findManyByUserId(userId);
-    const issues = rawIssues.map((issue) => this.formatRawIssue(issue, userId));
-    return issues;
+    if (rawIssues.length !== 0)
+      rawIssues.map((issue) => this.formatRawIssue(userId, issue));
+
+    return { message: '', data: { issues } };
   }
 
   private formatRawIssue(
-    rawIssue: RawIssue,
     userId: string,
-  ): IIssue & { isMine: boolean } {
-    try {
-      const { issueCategoryId, category, image, ...rest } = rawIssue;
-      const categoryName = category ? category.name : 'Any';
-      const imageUrl = image ? image.location : '기본 이미지 Url';
-      const isMine = userId == rawIssue.userId ? true : false;
-      return { ...rest, category: categoryName, imageUrl, isMine };
-    } catch (err) {
-      throw new InternalServerErrorException("Can't format issue");
-    }
+    rawIssue: IExtendedRawIssue,
+  ): IExtendedIssue {
+    const { issueCategoryId, category, image, ...rest } = rawIssue;
+
+    const extended: IExtendedIssue = {
+      ...rest,
+      category: category ? category.name : 'any',
+      imageUrl: image ? image.location : '기본 이미지 Url',
+      isMine: userId == rawIssue.userId ? true : false,
+    };
+
+    return extended;
   }
 }
