@@ -6,8 +6,10 @@ import { PrismaService } from 'src/service/prisma.service';
 class UserRepository {
   constructor(private prisma: PrismaService) {}
 
-  async create(userDto: CreateUserDto) {
-    return await this.prisma.user.create({ data: userDto });
+  async create(userDto: CreateUserDto, imageUrl: string) {
+    return await this.prisma.user.create({
+      data: { ...userDto, profileImage: imageUrl },
+    });
   }
 
   async findById(id: string) {

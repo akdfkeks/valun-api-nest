@@ -8,6 +8,13 @@ import * as path from 'path';
 import * as sharp from 'sharp';
 import { CreateImageDto } from 'src/interface/dto/image.dto';
 
+interface UploadOptions {
+  resize?: {
+    width?: number;
+    height?: number;
+  };
+}
+
 @Injectable()
 export class StorageService {
   private storage: S3;
@@ -21,28 +28,31 @@ export class StorageService {
     });
   }
 
-  async upload(file: Express.Multer.File): Promise<CreateImageDto> {
+  async upload(
+    file: Express.Multer.File,
+    options?: UploadOptions,
+  ): Promise<CreateImageDto> {
     if (!file) throw new BadRequestException('사진이 없습니다.');
     // if file is not typeof image
-    const { size, originalname } = file;
-    const format = path.extname(originalname);
-    const regularName = new Date().valueOf() + format;
-    const compedFileBuffer = await this.compress(file.buffer);
+    const { size: sourceSize, originalname: sourceName } = file;
+    const ext = path.extname(sourceName);
+    const regularName = new Date().valueOf() + ext;
+    const resizedImageBuffer = await this.resizeImage(file, options.resize);
 
     try {
       const uploaded = await this.storage
         .upload({
           Bucket: process.env.BUCKET_NAME as string,
           Key: regularName,
-          Body: compedFileBuffer,
+          Body: resizedImageBuffer,
         })
         .promise();
       return {
-        format,
-        sourceName: originalname,
+        format: ext,
+        sourceName,
         regularName,
-        sourceSize: size,
-        compdSize: compedFileBuffer.byteLength,
+        sourceSize,
+        compdSize: resizedImageBuffer.byteLength,
         location: uploaded.Location,
       };
     } catch (err) {
@@ -51,9 +61,12 @@ export class StorageService {
     }
   }
 
-  private compress(image: Buffer) {
+  private resizeImage(
+    image: Express.Multer.File,
+    options: { width?: number; height?: number },
+  ) {
     try {
-      return sharp(image).withMetadata().resize({ width: 1920 }).toBuffer();
+      return sharp(image.buffer).withMetadata().resize(options).toBuffer();
     } catch (err) {
       throw new InternalServerErrorException('이미지 압축 실패');
     }

@@ -2,18 +2,28 @@ import { Injectable } from '@nestjs/common';
 import { argon2i, hash, verify } from 'argon2';
 import { CreateUserDto } from 'src/interface/dto/user.dto';
 import UserRepository from '../repository/user.repository';
+import { StorageService } from './storage.service';
 
 @Injectable()
 export class UserService {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    private userRepository: UserRepository,
+    private storageService: StorageService,
+  ) {}
 
-  async signUp(userDto: CreateUserDto) {
+  async signUp(userDto: CreateUserDto, image) {
     const hashed = await this.hashPw(userDto.pw);
-    return await this.userRepository.create({
-      id: userDto.id,
-      pw: hashed,
-      nick: userDto.nick,
+    const { location } = await this.storageService.upload(image, {
+      resize: { width: 256 },
     });
+    return await this.userRepository.create(
+      {
+        id: userDto.id,
+        pw: hashed,
+        nick: userDto.nick,
+      },
+      location,
+    );
   }
 
   async findUniqueUser(id: string) {

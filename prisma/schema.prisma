@@ -21,6 +21,7 @@ model User {
   issueComment IssueComment[]
   Issue        Issue[]
   Solve        Solution[]
+  profileImage String         @default("") @db.LongText
 }
 
 model Issue {
