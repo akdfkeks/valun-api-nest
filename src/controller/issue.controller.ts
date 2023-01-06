@@ -69,7 +69,7 @@ export class IssueController {
   async postIssue(
     @Req() req: Request,
     @Body() issue: PostIssueDto,
-    @UploadedFile() image: Express.Multer.File = null,
+    @UploadedFile() image: Express.Multer.File,
   ) {
     const created = await this.issueService.createIssue(req.user, issue, image);
     return {

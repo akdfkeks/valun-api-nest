@@ -6,6 +6,7 @@ import { AuthModule } from './auth.module';
 import { IssueModule } from './issue.module';
 import { GlobalModule } from './global.module';
 import { UserModule } from './user.module';
+import { RequestLogger } from 'src/provider/middleware/req-logger.middleware';
 
 @Module({
   imports: [AuthModule, UserModule, IssueModule, GlobalModule],
@@ -14,7 +15,7 @@ import { UserModule } from './user.module';
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    // consumer.apply(LoggerMiddleware).forRoutes('*');
+    consumer.apply(RequestLogger).forRoutes('*');
     consumer
       .apply(AuthMiddleware)
       .forRoutes({ path: '*', method: RequestMethod.ALL });

@@ -1,21 +1,22 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request } from 'express';
+import { Request, NextFunction } from 'express';
+import { IncomingHttpHeaders } from 'http';
 import { AuthService } from 'src/service/auth.service';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
   constructor(private readonly authService: AuthService) {}
 
-  public async use(req: Request, res, next: () => void) {
-    const token = await this.extractJwt(req);
+  public async use(req: Request, res, next: NextFunction) {
+    const token = this.extractJwtFromHeader(req.headers);
     req.user = await this.authService.validateJwt(token);
 
     return next();
   }
 
-  private async extractJwt(req) {
+  private extractJwtFromHeader(headers: IncomingHttpHeaders) {
     try {
-      const { authorization } = req.headers;
+      const { authorization } = headers;
       return authorization.replace('Bearer ', '').replace('bearer ', '');
     } catch (e) {
       return null;
