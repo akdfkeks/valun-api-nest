@@ -31,30 +31,30 @@ import { IssueService } from 'src/service/issue.service';
 export class IssueController {
   constructor(private issueService: IssueService) {}
 
-  @UseGuards(StrictJwtGuard)
-  @Get(':id/solve')
-  async getIssueSolution(
-    @Param('id', new ParseIntPipe()) id: number,
-    @Req() req: Request,
-  ) {
-    return {
-      message: '',
-      data: {
-        issue: {
-          id: 1,
-          userId: 'test1',
-          description: 'bla bla bla',
-          image: 'sample issue image',
-        },
-        solution: {
-          id: 1,
-          userId: 'test1',
-          description: 'bla bla bla',
-          image: 'sample solution image',
-        },
-      },
-    };
-  }
+  // @UseGuards(StrictJwtGuard)
+  // @Get(':id/solve')
+  // async getIssueSolution(
+  //   @Param('id', new ParseIntPipe()) id: number,
+  //   @Req() req: Request,
+  // ) {
+  //   return {
+  //     message: '',
+  //     data: {
+  //       issue: {
+  //         id: 1,
+  //         userId: 'test1',
+  //         description: 'bla bla bla',
+  //         image: 'sample issue image',
+  //       },
+  //       solution: {
+  //         id: 1,
+  //         userId: 'test1',
+  //         description: 'bla bla bla',
+  //         image: 'sample solution image',
+  //       },
+  //     },
+  //   };
+  // }
 
   @UseGuards(StrictJwtGuard)
   @Post(':id/solve')
@@ -63,8 +63,8 @@ export class IssueController {
     @Body() solution: PostSolutionDto,
   ) {}
 
-  @UseInterceptors(FileInterceptor('image'))
   @UseGuards(StrictJwtGuard)
+  @UseInterceptors(FileInterceptor('image'))
   @Post('')
   async postIssue(
     @Req() req: Request,

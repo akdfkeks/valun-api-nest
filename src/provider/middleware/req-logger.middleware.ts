@@ -11,9 +11,7 @@ export class RequestLogger implements NestMiddleware {
   }
 
   use(req: Request, res: any, next: NextFunction) {
-    this.logger.log(
-      `${req.method} ${req.originalUrl} ${req.hostname}@${req.ip}`,
-    );
+    this.logger.log(`${req.method} ${req.originalUrl} ${req.ip}`);
     return next();
   }
 }

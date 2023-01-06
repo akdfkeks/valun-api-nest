@@ -25,7 +25,9 @@ export class IssueService {
     issue: any,
     image: Express.Multer.File,
   ) {
-    const upload = await this.storageService.upload(image);
+    const upload = await this.storageService.upload(image, {
+      resize: { width: 1080 },
+    });
     return await this.issueRepository.create(userId, issue, upload);
   }
 
