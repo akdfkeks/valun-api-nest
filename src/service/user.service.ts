@@ -26,6 +26,22 @@ export class UserService {
     );
   }
 
+  async findUserProfile(userId: string) {
+    const { id, nick, broom, profileImage } =
+      await this.userRepository.findById(userId);
+    return {
+      message: '내 정보',
+      data: {
+        profile: {
+          id,
+          nick,
+          broom,
+          profileImage,
+        },
+      },
+    };
+  }
+
   async findUniqueUser(id: string) {
     return await this.userRepository.findById(id);
   }

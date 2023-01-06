@@ -80,6 +80,7 @@ export class IssueController {
       },
     };
   }
+
   // 최근 이슈 목록 조회
   @UseGuards(StrictJwtGuard)
   @Get('recent')
@@ -93,6 +94,12 @@ export class IssueController {
       getRecentIssuesDto,
       5,
     );
+  }
+
+  // Web 용 이슈 조회
+  @Get('sample')
+  async getSampleIssues() {
+    return await this.issueService.findAllIssues(null, null, 5);
   }
 
   @Get(':id')

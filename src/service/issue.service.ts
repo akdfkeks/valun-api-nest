@@ -31,6 +31,10 @@ export class IssueService {
     return await this.issueRepository.create(userId, issue, upload);
   }
 
+  public async findSampleIssues() {
+    // const rawIssues = await this.issueRepository.find
+  }
+
   public async findAllIssues(
     userId: string,
     getIssuesDto: GetIssuesDto,

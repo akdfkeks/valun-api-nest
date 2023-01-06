@@ -1,17 +1,18 @@
 import {
   Controller,
   UseGuards,
-  Request,
   Get,
   Post,
   Body,
   UseInterceptors,
   UploadedFile,
+  Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateUserDto } from 'src/interface/dto/user.dto';
 import { StrictJwtGuard } from 'src/provider/guard/strict-jwt.guard';
 import { UserService } from 'src/service/user.service';
+import { Request } from 'express';
 
 @Controller('user')
 export class UserController {
@@ -32,8 +33,8 @@ export class UserController {
   }
 
   @UseGuards(StrictJwtGuard)
-  @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
+  @Get('myprofile')
+  async getMyProfile(@Req() req: Request) {
+    return await this.userService.findUserProfile(req.user);
   }
 }
