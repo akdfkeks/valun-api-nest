@@ -7,6 +7,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
 model User {
   uuid         String         @id @default(value: uuid())
   id           String         @unique @db.VarChar(63)
