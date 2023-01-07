@@ -1,19 +1,29 @@
-import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  INestApplication,
+  Injectable,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import * as dayjs from 'dayjs';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit {
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   constructor() {
-    super({ log: [{ emit: 'event', level: 'query' }] });
-  }
-  async onModuleInit() {
-    await this.$connect();
+    super({
+      log: [
+        { emit: 'stdout', level: 'query' },
+        { emit: 'stdout', level: 'error' },
+      ],
+    });
 
     /****************************/
     /*** TIME ZONE MIDDLEWARE ***/
     /****************************/
-    await this.$use(async (params, next) => {
+    this.$use(async (params, next) => {
       if (params.model !== 'Issue') return next(params);
 
       const result = await next(params);
@@ -30,10 +40,16 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     });
   }
 
+  async onModuleInit() {
+    await this.$connect();
+  }
+
+  async onModuleDestroy() {
+    await this.$disconnect();
+  }
+
   async enableShutdownHooks(app: INestApplication) {
-    this.$on('beforeExit', async () => {
-      await app.close();
-    });
+    this.$on('beforeExit', async () => await app.close());
   }
 
   private toKST(datetime: Date) {
