@@ -23,17 +23,16 @@ import { SolutionService } from 'src/service/solution.service';
 @UseGuards(StrictJwtGuard)
 @Controller('solutions')
 export class SolutionController {
-  constructor(
-    private issueService: IssueService,
-    private solutionService: SolutionService,
-  ) {}
+  constructor(private solutionService: SolutionService) {}
 
   @Post(':id/allow')
   async postAllow(
     @Param('id') id: number,
     @Req() req: Request,
     // @Body() accept: CreateAllowBody,
-  ) {}
+  ) {
+    return this.solutionService.allowSolution(req.user, id);
+  }
 
   @Post(':id/reject')
   async postRejection(

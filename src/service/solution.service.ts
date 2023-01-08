@@ -23,7 +23,7 @@ export class SolutionService {
     solutionBody: CreateSolutionBody,
     image: Express.Multer.File,
   ) {
-    /* 1. 먼저 해결하려는 이슈의 상태(존재, 제보자, 해결여부) 확인해야한다.
+    /* 1. 일단 이슈를 조회해본다
      * 2. 존재하지 않는다면, NotFoundException
      * 3. 존재한다면, 이미지를 업로드 후 solution 을 생성한다.
      */
@@ -56,5 +56,14 @@ export class SolutionService {
       });
 
     return { message: '해결 등록 성공', data: null };
+  }
+
+  async allowSolution(userId: string, solutionId: number) {
+    /**
+     * 1. 존재하는 solution 인지
+     * 2. 이 솔루션이 allow 할 수 있는 상태인지
+     * 3. 이슈를 solved 처리
+     * 4. solution 을 fix
+     */
   }
 }
