@@ -14,7 +14,6 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import { GetIssuesQuery, CreateIssueBody } from 'src/interface/dto/issue.dto';
-import { CreateSolutionBody } from 'src/interface/dto/solution.dto';
 import { StrictJwtGuard } from 'src/provider/guard/strict-jwt.guard';
 import { IssueService } from 'src/service/issue.service';
 
@@ -45,13 +44,13 @@ export class IssueController {
     };
   }
 
-  // Web 용 Sample Issue 조회
+  // * Web : 최근 제보된 이슈를 조회합니다.
   @Get('samples')
   async getSampleIssues() {
     return await this.issueService.findSampleIssues();
   }
 
-  // 단일 이슈 조회
+  // * APP : 이슈 고유 ID 로 특정한 이슈를 조회합니다.
   @Get(':id')
   async getIssue(
     @Req() req: Request,
@@ -61,11 +60,11 @@ export class IssueController {
     return await this.issueService.findIssueById(req.user, id);
   }
 
-  // 주변 이슈 목록 조회
+  // * APP : 사용자의 위치를 기준으로 특정 카테고리에 속하는 미해결 이슈를 반환합니다.
   @Get('')
-  async getAllIssues(
-    @Query() getIssuesDto: GetIssuesQuery,
+  async getNearbyIssues(
     @Req() req: Request,
+    @Query() getIssuesDto: GetIssuesQuery,
   ) {
     return await this.issueService.findNearbyIssues(req.user, getIssuesDto);
   }

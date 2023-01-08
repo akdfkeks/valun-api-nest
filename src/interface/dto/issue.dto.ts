@@ -16,18 +16,16 @@ export class GetIssuesQuery {
   @IsOptional()
   categories?: string[];
 
-  @IsLatitude()
   @Transform(({ value }: { value: string }) => parseFloat(value))
+  @IsLatitude()
   @IsNotEmpty()
   lat: number;
 
-  @IsLongitude()
   @Transform(({ value }: { value: string }) => parseFloat(value))
+  @IsLongitude()
   @IsNotEmpty()
   lng: number;
 }
-
-export class GetIssueParam {}
 
 export class CreateIssueBody {
   @IsNotEmpty()

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateImageDto } from 'src/interface/dto/image.dto';
@@ -43,8 +44,16 @@ export class SolutionService {
       solutionBody,
       upload,
     );
+    if (!solution) throw new InternalServerErrorException('등록 실패');
 
-    if (solution) this.issueService.updateIssueStatus(issue.id, 'PENDING');
+    this.issueService
+      .updateIssueStatus(issue.id, 'PENDING')
+      .then(() => {
+        // 알람을 하나 생성해야함
+      })
+      .catch(() => {
+        //응잉옹
+      });
 
     return { message: '해결 등록 성공', data: null };
   }

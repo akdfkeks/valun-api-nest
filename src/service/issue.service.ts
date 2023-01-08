@@ -36,7 +36,10 @@ export class IssueService {
   }
 
   public async findSampleIssues() {
-    const rawIssues = await this.issueRepository.findMany({});
+    const rawIssues = await this.issueRepository.findMany({
+      status: 'UNSOLVED',
+      take: 5,
+    });
     if (rawIssues.length == 0) return [];
 
     const iIssues = rawIssues.map((issue) => this.formatRawIssue(null, issue));
@@ -48,7 +51,10 @@ export class IssueService {
   }
 
   public async findNearbyIssues(userId: string, getIssuesDto: GetIssuesQuery) {
-    const rawIssues = await this.issueRepository.findMany({ ...getIssuesDto });
+    const rawIssues = await this.issueRepository.findMany({
+      ...getIssuesDto,
+      status: 'UNSOLVED',
+    });
     if (rawIssues.length == 0) return [];
 
     const iIssues = rawIssues.map((issue) =>

@@ -88,7 +88,7 @@ class IssueRepository {
     lat = undefined,
     lng = undefined,
     categories = undefined,
-    status = 'UNSOLVED',
+    status = undefined,
     take = undefined,
   }: {
     userId?: string;
