@@ -7,9 +7,10 @@ import { IssueModule } from './issue.module';
 import { GlobalModule } from './global.module';
 import { UserModule } from './user.module';
 import { RequestLogger } from 'src/provider/middleware/req-logger.middleware';
+import { SolutionModule } from './solution.module';
 
 @Module({
-  imports: [AuthModule, UserModule, IssueModule, GlobalModule],
+  imports: [AuthModule, UserModule, IssueModule, SolutionModule, GlobalModule],
   controllers: [AppController],
   providers: [AppService],
 })

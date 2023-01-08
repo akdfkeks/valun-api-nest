@@ -1,37 +1,53 @@
-// import {
-//   Body,
-//   Controller,
-//   Get,
-//   Param,
-//   ParseIntPipe,
-//   Post,
-//   Req,
-//   UseGuards,
-// } from '@nestjs/common';
-// import { Request } from 'express';
-// import { CreateSolveDto } from 'src/dto/solve.dto';
-// import { StrictJwtGuard } from 'src/provider/guard/strict-jwt.guard';
-// import { IssueService } from 'src/service/issue.service';
-// import { SolveService } from 'src/service/sovle.service';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Request } from 'express';
+import {
+  CreateRejectionBody,
+  CreateSolutionBody,
+} from 'src/interface/dto/solution.dto';
+import { StrictJwtGuard } from 'src/provider/guard/strict-jwt.guard';
+import { IssueService } from 'src/service/issue.service';
+import { SolutionService } from 'src/service/solution.service';
 
-// @Controller('solutions')
-// export class SolutionController {
-//   constructor(
-//     private issueService: IssueService,
-//     private solutionService: SolveService,
-//   ) {}
+@UseGuards(StrictJwtGuard)
+@Controller('solutions')
+export class SolutionController {
+  constructor(
+    private issueService: IssueService,
+    private solutionService: SolutionService,
+  ) {}
 
-//   @Get(':id')
-//   async getSolve(@Param('id', new ParseIntPipe()) id: number) {}
+  @Post(':id/allow')
+  async postAllow(
+    @Param('id') id: number,
+    @Req() req: Request,
+    // @Body() accept: CreateAllowBody,
+  ) {}
 
-//   @UseGuards(StrictJwtGuard)
-//   @Post(':id/allow')
-//   async postAllowSolve(
-//     @Param('id', new ParseIntPipe()) id: number,
-//     @Body() solve: CreateSolveDto,
-//   ) {}
+  @Post(':id/reject')
+  async postRejection(
+    @Req() req: Request,
+    @Body() rejection: CreateRejectionBody,
+  ) {}
 
-//   @UseGuards(StrictJwtGuard)
-//   @Post('')
-//   async postSolve(@Body() solve: CreateSolveDto) {}
-// }
+  @UseInterceptors(FileInterceptor('image'))
+  @Post('')
+  async postSolution(
+    @Req() req: Request,
+    @Body() solution: CreateSolutionBody,
+    @UploadedFile() image: Express.Multer.File,
+  ) {
+    return await this.solutionService.createSolution(req.user, solution, image);
+  }
+}

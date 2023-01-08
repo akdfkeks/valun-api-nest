@@ -1,20 +1,27 @@
 import { Injectable } from '@nestjs/common';
+import { CreateImageDto } from 'src/interface/dto/image.dto';
+import { CreateSolutionBody } from 'src/interface/dto/solution.dto';
 import { PrismaService } from 'src/service/prisma.service';
 
 @Injectable()
-class SolutionRepository {
+export class SolutionRepository {
   includeImage: { include: { image: boolean } };
 
   constructor(private prisma: PrismaService) {
     this.includeImage = { include: { image: true } };
   }
 
-  public async create() {
+  public async create(
+    userId: string,
+    solutionBody: CreateSolutionBody,
+    imageDto: CreateImageDto,
+  ) {
     return await this.prisma.solution.create({
       data: {
-        user: { connect: { id: 'test1' } },
-        issue: { connect: { id: 1 } },
-        description: 'test description text',
+        user: { connect: { id: userId } },
+        issue: { connect: { id: solutionBody.issueId } },
+        description: solutionBody.description,
+        image: { create: { ...imageDto } },
       },
     });
   }

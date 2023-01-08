@@ -7,5 +7,6 @@ import { IssueService } from 'src/service/issue.service';
   imports: [],
   controllers: [IssueController],
   providers: [IssueService, IssueRepository],
+  exports: [IssueService, IssueRepository],
 })
 export class IssueModule {}
