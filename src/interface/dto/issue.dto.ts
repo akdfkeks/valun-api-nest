@@ -35,7 +35,6 @@ export class CreateIssueBody {
 
   @IsString()
   @Transform(({ value }: { value: string }) => {
-    console.log('1');
     return categoryParser(value, categoryJson)[0];
   })
   @IsNotEmpty()
