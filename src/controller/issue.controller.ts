@@ -50,6 +50,14 @@ export class IssueController {
     return await this.issueService.findSampleIssues();
   }
 
+  @Get('recent')
+  async getRecentIssues(
+    @Req() req: Request,
+    @Query() getIssuesQuery: GetIssuesQuery,
+  ) {
+    return await this.issueService.findRecentIssues(req.user, getIssuesQuery);
+  }
+
   // * APP : 이슈 고유 ID 로 특정한 이슈를 조회합니다.
   @Get(':id')
   async getIssue(

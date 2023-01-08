@@ -50,6 +50,22 @@ export class IssueService {
     };
   }
 
+  public async findRecentIssues(userId, getIssuesQuery: GetIssuesQuery) {
+    const rawIssues = await this.issueRepository.findMany({
+      ...getIssuesQuery,
+      status: 'UNSOLVED',
+      take: 10,
+    });
+
+    if (rawIssues.length == 0) return [];
+
+    const iIssues = rawIssues.map((issue) =>
+      this.formatRawIssue(userId, issue),
+    );
+
+    return { message: '사용자 주변 최근 이슈 목록', data: { issues: iIssues } };
+  }
+
   public async findNearbyIssues(userId: string, getIssuesDto: GetIssuesQuery) {
     const rawIssues = await this.issueRepository.findMany({
       ...getIssuesDto,
