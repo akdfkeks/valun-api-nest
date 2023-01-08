@@ -13,12 +13,8 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
-import {
-  GetIssuesDto,
-  GetIssueQuery,
-  PostIssueDto,
-} from 'src/interface/dto/issue.dto';
-import { PostSolutionDto } from 'src/interface/dto/solution.dto';
+import { GetIssuesQuery, CreateIssueBody } from 'src/interface/dto/issue.dto';
+import { CreateSolutionBody } from 'src/interface/dto/solution.dto';
 import { StrictJwtGuard } from 'src/provider/guard/strict-jwt.guard';
 import { IssueService } from 'src/service/issue.service';
 
@@ -31,44 +27,12 @@ import { IssueService } from 'src/service/issue.service';
 export class IssueController {
   constructor(private issueService: IssueService) {}
 
-  // @UseGuards(StrictJwtGuard)
-  // @Get(':id/solve')
-  // async getIssueSolution(
-  //   @Param('id', new ParseIntPipe()) id: number,
-  //   @Req() req: Request,
-  // ) {
-  //   return {
-  //     message: '',
-  //     data: {
-  //       issue: {
-  //         id: 1,
-  //         userId: 'test1',
-  //         description: 'bla bla bla',
-  //         image: 'sample issue image',
-  //       },
-  //       solution: {
-  //         id: 1,
-  //         userId: 'test1',
-  //         description: 'bla bla bla',
-  //         image: 'sample solution image',
-  //       },
-  //     },
-  //   };
-  // }
-
-  @UseGuards(StrictJwtGuard)
-  @Post(':id/solve')
-  async postIssueSolution(
-    @Param('id', new ParseIntPipe()) id: number,
-    @Body() solution: PostSolutionDto,
-  ) {}
-
   @UseGuards(StrictJwtGuard)
   @UseInterceptors(FileInterceptor('image'))
   @Post('')
   async postIssue(
     @Req() req: Request,
-    @Body() issue: PostIssueDto,
+    @Body() issue: CreateIssueBody,
     @UploadedFile() image: Express.Multer.File,
   ) {
     const created = await this.issueService.createIssue(req.user, issue, image);
@@ -81,27 +45,13 @@ export class IssueController {
     };
   }
 
-  // 최근 이슈 목록 조회
-  @UseGuards(StrictJwtGuard)
-  @Get('recent')
-  async getRecentIssues(
-    @Req() req: Request,
-    @Query() getRecentIssuesDto: GetIssuesDto,
-  ) {
-    getRecentIssuesDto.categories = undefined;
-    return await this.issueService.findAllIssues(
-      req.user,
-      getRecentIssuesDto,
-      5,
-    );
-  }
-
-  // Web 용 이슈 조회
-  @Get('sample')
+  // Web 용 Sample Issue 조회
+  @Get('samples')
   async getSampleIssues() {
-    return await this.issueService.findAllIssues(null, null, 5);
+    return await this.issueService.findSampleIssues();
   }
 
+  // 단일 이슈 조회
   @Get(':id')
   async getIssue(
     @Req() req: Request,
@@ -113,13 +63,10 @@ export class IssueController {
 
   // 주변 이슈 목록 조회
   @Get('')
-  async getAllIssues(@Query() getIssuesDto: GetIssuesDto, @Req() req: Request) {
-    // Temp
-    let newArr = getIssuesDto.categories.filter((element) => {
-      return element !== undefined && element !== null && element !== '';
-    });
-    getIssuesDto.categories = newArr.length == 0 ? undefined : newArr;
-
-    return await this.issueService.findAllIssues(req.user, getIssuesDto);
+  async getAllIssues(
+    @Query() getIssuesDto: GetIssuesQuery,
+    @Req() req: Request,
+  ) {
+    return await this.issueService.findNearbyIssues(req.user, getIssuesDto);
   }
 }

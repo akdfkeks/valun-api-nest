@@ -3,12 +3,12 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Issue as PIssue } from '@prisma/client';
+import { CreateImageDto } from 'src/interface/dto/image.dto';
 import {
-  GetIssuesDto,
+  CreateIssueBody,
+  GetIssuesQuery,
   IExtendedIssue,
   IExtendedRawIssue,
-  GetIssueQuery,
 } from 'src/interface/dto/issue.dto';
 import IssueRepository from 'src/repository/issue.repository';
 import { StorageService } from './storage.service';
@@ -22,32 +22,33 @@ export class IssueService {
 
   public async createIssue(
     userId: string,
-    issue: any,
+    issue: CreateIssueBody,
     image: Express.Multer.File,
   ) {
-    const upload = await this.storageService.upload(image, {
+    const upload: CreateImageDto = await this.storageService.upload(image, {
       resize: { width: 1080 },
     });
     return await this.issueRepository.create(userId, issue, upload);
   }
 
-  public async findSampleIssues() {
-    // const rawIssues = await this.issueRepository.find
+  public async updateIssueStatus(issueId, status) {
+    return await this.issueRepository.updateOne({ id: issueId, status });
   }
 
-  public async findAllIssues(
-    userId: string,
-    getIssuesDto: GetIssuesDto,
-    count: number = undefined,
-  ) {
-    const DISTANCE = 500; //임시: 조회 반경 (km)
-    const rawIssues = await this.issueRepository.findManyInSquareByLatLng(
-      getIssuesDto.lat,
-      getIssuesDto.lng,
-      DISTANCE,
-      getIssuesDto.categories,
-      count,
-    );
+  public async findSampleIssues() {
+    const rawIssues = await this.issueRepository.findMany({});
+    if (rawIssues.length == 0) return [];
+
+    const iIssues = rawIssues.map((issue) => this.formatRawIssue(null, issue));
+
+    return {
+      message: `최근 제보된 ${iIssues.length}건의 이슈`,
+      data: { issues: iIssues },
+    };
+  }
+
+  public async findNearbyIssues(userId: string, getIssuesDto: GetIssuesQuery) {
+    const rawIssues = await this.issueRepository.findMany({ ...getIssuesDto });
     if (rawIssues.length == 0) return [];
 
     const iIssues = rawIssues.map((issue) =>
@@ -57,13 +58,9 @@ export class IssueService {
     return { message: '사용자 주변 이슈 목록', data: { issues: iIssues } };
   }
 
-  public async findIssueById(
-    userId: string,
-    issueId: number,
-    field?: GetIssueQuery,
-  ) {
+  public async findIssueById(userId: string, issueId: number) {
     const rawIssue = await this.issueRepository.findOneById(issueId);
-    if (!rawIssue) throw new NotFoundException('그런 이슈는 없어용');
+    if (!rawIssue) throw new NotFoundException('존재하지 않는 이슈입니다.');
 
     const issue = this.formatRawIssue(userId, rawIssue);
 

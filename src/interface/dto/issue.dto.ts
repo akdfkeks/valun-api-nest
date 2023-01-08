@@ -2,43 +2,44 @@ import { Issue as PrismaIssue } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
-  IsIn,
   IsLatitude,
   IsLongitude,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
 
-export class GetIssueQuery {
-  @Transform(({ value }) => value.split(','))
-  fields?: string[] = undefined;
-}
-
-export class GetIssuesDto {
-  @IsArray()
-  @Transform(({ value }) => value.split(','))
+export class GetIssuesQuery {
+  @Transform(({ value }: { value: string }) => {
+    return categoryParser(value, categoryJson);
+  })
   @IsOptional()
   categories?: string[];
 
   @IsLatitude()
-  @Transform(({ value }) => parseFloat(value))
+  @Transform(({ value }: { value: string }) => parseFloat(value))
   @IsNotEmpty()
   lat: number;
 
   @IsLongitude()
-  @Transform(({ value }) => parseFloat(value))
+  @Transform(({ value }: { value: string }) => parseFloat(value))
   @IsNotEmpty()
   lng: number;
 }
 
-export class PostIssueDto {
-  @IsString()
+export class GetIssueParam {}
+
+export class CreateIssueBody {
+  @IsNotEmpty()
   description: string = '';
 
   @IsString()
-  category: string;
+  @Transform(({ value }: { value: string }) => {
+    console.log('1');
+    return categoryParser(value, categoryJson)[0];
+  })
+  @IsNotEmpty()
+  category: string = 'etc';
 
   @IsLatitude()
   @Transform(({ value }) => parseFloat(value))
@@ -69,5 +70,28 @@ export interface IExtendedRawIssue extends PrismaIssue {
   image: { location: string };
 }
 
-type TIssueField = keyof IExtendedIssue;
-const IssueField: TIssueField[] = [];
+// DB 에서 읽어오던 JSON 으로 관리하던..고민중
+const categoryJson = {
+  플라스틱: 'plastic',
+  PET: 'pet',
+  금속: 'metal',
+  종이: 'paper',
+  일반쓰레기: 'trash',
+  스티로폼: 'styrofoam',
+  유리: 'glass',
+  음식쓰레기: 'garbage',
+  폐기물: 'waste',
+  목재: 'lumber',
+  비닐: 'vinyl',
+  기타: 'etc',
+} as const;
+
+const categoryParser = (keys: string, obj: Record<string, string>) => {
+  const categoryList = Object.values(obj);
+  const refined = keys.split(',').filter((element) => {
+    return categoryList.includes(element);
+  });
+  return refined.length == 0 ? undefined : refined;
+};
+
+Array;

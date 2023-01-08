@@ -15,7 +15,7 @@ export class PrismaService
   constructor() {
     super({
       log: [
-        { emit: 'stdout', level: 'query' },
+        // { emit: 'stdout', level: 'query' },
         { emit: 'stdout', level: 'error' },
       ],
     });

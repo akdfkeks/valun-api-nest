@@ -1,67 +1,70 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { IssueStatus } from '@prisma/client';
 import { CreateImageDto } from 'src/interface/dto/image.dto';
-import { PostIssueDto, IExtendedRawIssue } from 'src/interface/dto/issue.dto';
+import {
+  CreateIssueBody,
+  IExtendedRawIssue,
+} from 'src/interface/dto/issue.dto';
 import { PrismaService } from 'src/service/prisma.service';
+import {
+  categoryAndImage,
+  createIssueWithImageValidator,
+} from './validator/issue.validator';
 
 @Injectable()
 class IssueRepository {
-  private includeCategoryAndImage: {
-    include: {
-      category: { select: { name: boolean } };
-      image: { select: { location: boolean } };
-    };
-  };
+  constructor(private prisma: PrismaService) {}
 
-  constructor(private prisma: PrismaService) {
-    this.includeCategoryAndImage = {
-      include: {
-        category: {
-          select: { name: true },
-        },
-        image: {
-          select: { location: true },
-        },
-      },
-    };
-  }
-
+  // Fix
   public async create(
     userId: string,
-    issueDto: PostIssueDto,
+    issueBody: CreateIssueBody,
     imageDto: CreateImageDto,
   ) {
     return await this.prisma.issue.create({
+      data: createIssueWithImageValidator(userId, issueBody, imageDto),
+    });
+  }
+
+  public async updateOne({
+    id,
+    status = undefined,
+    description = undefined,
+    category = undefined,
+  }: {
+    id: number;
+    status?: IssueStatus;
+    description?: string;
+    category?: string;
+  }) {
+    return await this.prisma.issue.update({
+      where: { id },
       data: {
-        user: { connect: { id: userId } },
-        category: {
-          connectOrCreate: {
-            where: { name: issueDto.category },
-            create: { name: issueDto.category },
-          },
-        },
-        description: issueDto.description,
-        lat: issueDto.lat,
-        lng: issueDto.lng,
-        image: { create: imageDto },
+        status,
+        description,
+        category: category
+          ? {
+              connectOrCreate: {
+                create: { name: category },
+                where: { name: category },
+              },
+            }
+          : undefined,
       },
     });
   }
 
-  public async findOneById(id: number): Promise<IExtendedRawIssue> {
+  public async findOneById(id: number) {
     return await this.prisma.issue.findUnique({
       where: { id },
-      ...this.includeCategoryAndImage,
+      include: categoryAndImage,
     });
   }
 
   public async findManyByUserId(userId: string): Promise<IExtendedRawIssue[]> {
     return await this.prisma.issue.findMany({
       where: { userId, status: 'UNSOLVED' },
-      ...this.includeCategoryAndImage,
+      include: categoryAndImage,
     });
   }
 
@@ -80,32 +83,44 @@ class IssueRepository {
     // order by createdAt 추가하기
   }
 
-  public async findManyInSquareByLatLng(
-    lat: number,
-    lng: number,
-    distance: number,
-    categories: string[],
-    count: number,
-  ): Promise<IExtendedRawIssue[]> {
-    const { t, g } = this.distToLatLng(distance);
+  public async findMany({
+    userId = undefined,
+    lat = undefined,
+    lng = undefined,
+    categories = undefined,
+    status = 'UNSOLVED',
+    take = undefined,
+  }: {
+    userId?: string;
+    lat?: number;
+    lng?: number;
+    status?: IssueStatus;
+    categories?: string[];
+    take?: number;
+  }): Promise<IExtendedRawIssue[]> {
+    // 나중에 없애기
+    const { t, g } = this.getLatLngRange();
 
     return await this.prisma.issue.findMany({
       where: {
-        status: 'UNSOLVED',
-        lat: { lte: lat + t, gte: lat - t },
-        lng: { lte: lng + g, gte: lng - g },
+        userId,
+        status,
         category: categories ? { name: { in: categories } } : undefined,
+        lat: lat ? { lte: lat + t, gte: lat - t } : undefined,
+        lng: lng ? { lte: lng + g, gte: lng - g } : undefined,
       },
-      ...this.includeCategoryAndImage,
+      include: categoryAndImage,
       orderBy: { createdAt: 'desc' },
-      take: count,
+      take,
     });
   }
 
-  private distToLatLng(distance: number) {
+  // 이놈이 함수로 존재할 이유가 없는데 나중에 고칠래
+  private getLatLngRange() {
     const KMPERLAT = 0.00899361453;
     const KMPERLNG = 0.01126126126;
-    return { t: distance * KMPERLAT, g: distance * KMPERLNG };
+    const RADIUS = 500;
+    return { t: RADIUS * KMPERLAT, g: RADIUS * KMPERLNG };
   }
 }
 
