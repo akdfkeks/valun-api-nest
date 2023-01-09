@@ -31,14 +31,17 @@ export class SolutionController {
     @Req() req: Request,
     // @Body() accept: CreateAllowBody,
   ) {
-    return this.solutionService.allowSolution(req.user, id);
+    return this.solutionService.acceptSolution(req.user, id);
   }
 
   @Post(':id/reject')
   async postRejection(
     @Req() req: Request,
+    @Param('id') id: number,
     @Body() rejection: CreateRejectionBody,
-  ) {}
+  ) {
+    return this.solutionService.rejectSolution(req.user, id, rejection);
+  }
 
   @UseInterceptors(FileInterceptor('image'))
   @Post('')

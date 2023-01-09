@@ -5,11 +5,7 @@ import { PrismaService } from 'src/service/prisma.service';
 
 @Injectable()
 export class SolutionRepository {
-  includeImage: { include: { image: boolean } };
-
-  constructor(private prisma: PrismaService) {
-    this.includeImage = { include: { image: true } };
-  }
+  constructor(private prisma: PrismaService) {}
 
   public async create(
     userId: string,
@@ -27,23 +23,23 @@ export class SolutionRepository {
   }
 
   public async findOneById(id: number) {
-    return await this.prisma.solution.findUnique({
+    return await this.prisma.solution.findUniqueOrThrow({
       where: { id },
-      ...this.includeImage,
+      include: {
+        issue: true,
+      },
     });
   }
 
   public async findManyByIssueId(id: number) {
     return await this.prisma.solution.findMany({
       where: { issueId: id },
-      ...this.includeImage,
     });
   }
 
   public async findManyByUserId(id: string) {
     return await this.prisma.solution.findMany({
       where: { userId: id },
-      ...this.includeImage,
     });
   }
 }
