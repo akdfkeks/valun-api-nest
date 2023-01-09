@@ -35,6 +35,6 @@ export class UserController {
   @UseGuards(StrictJwtGuard)
   @Get('myprofile')
   async getMyProfile(@Req() req: Request) {
-    return await this.userService.findUserProfile(req.user);
+    return await this.userService.findUserProfileWithNoti(req.user);
   }
 }

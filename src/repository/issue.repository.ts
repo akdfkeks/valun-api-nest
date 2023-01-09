@@ -115,6 +115,15 @@ class IssueRepository {
     });
   }
 
+  public async findByUserIdWithSolution(userId: string) {
+    return await this.prisma.issue.findMany({
+      where: { userId: userId, status: 'PENDING' },
+      include: {
+        solutions: true,
+      },
+    });
+  }
+
   // 이놈이 함수로 존재할 이유가 없는데 나중에 고칠래
   private getLatLngRange() {
     const KMPERLAT = 0.00899361453;

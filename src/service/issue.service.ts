@@ -7,7 +7,7 @@ import { CreateImageDto } from 'src/interface/dto/image.dto';
 import {
   CreateIssueBody,
   GetIssuesQuery,
-  IExtendedIssue,
+  IIssue,
   IExtendedRawIssue,
 } from 'src/interface/dto/issue.dto';
 import IssueRepository from 'src/repository/issue.repository';
@@ -50,6 +50,13 @@ export class IssueService {
     };
   }
 
+  public async findPendingIssues(userId: string) {
+    const pendings = await this.issueRepository.findMany({
+      userId,
+      status: 'PENDING',
+    });
+  }
+
   public async findRecentIssues(userId, getIssuesQuery: GetIssuesQuery) {
     const rawIssues = await this.issueRepository.findMany({
       ...getIssuesQuery,
@@ -90,7 +97,7 @@ export class IssueService {
   }
 
   public async findIssuesByUserId(userId: string) {
-    let issues: IExtendedIssue[] = [];
+    let issues: IIssue[] = [];
 
     const rawIssues = await this.issueRepository.findManyByUserId(userId);
     if (rawIssues.length !== 0)
@@ -99,13 +106,10 @@ export class IssueService {
     return { message: '', data: { issues } };
   }
 
-  private formatRawIssue(
-    userId: string,
-    rawIssue: IExtendedRawIssue,
-  ): IExtendedIssue {
+  private formatRawIssue(userId: string, rawIssue: IExtendedRawIssue): IIssue {
     const { issueCategoryId, category, image, ...rest } = rawIssue;
 
-    const extended: IExtendedIssue = {
+    const extended: IIssue = {
       ...rest,
       category: category ? category.name : 'any',
       imageUrl: image ? image.location : '기본 이미지 Url',

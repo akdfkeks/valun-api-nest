@@ -26,9 +26,10 @@ export class UserService {
     );
   }
 
-  async findUserProfile(userId: string) {
+  async findUserProfileWithNoti(userId: string) {
     const { id, nick, broom, profileImage } =
       await this.userRepository.findById(userId);
+
     return {
       message: '내 정보',
       data: {
