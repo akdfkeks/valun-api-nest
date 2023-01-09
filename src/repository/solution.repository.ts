@@ -18,6 +18,8 @@ export class SolutionRepository {
         issue: { connect: { id: solutionBody.issueId } },
         description: solutionBody.description,
         image: { create: { ...imageDto } },
+        lat: solutionBody.lat,
+        lng: solutionBody.lng,
       },
     });
   }

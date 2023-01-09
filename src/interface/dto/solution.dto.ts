@@ -9,6 +9,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { IIssue } from './issue.dto';
 
 export class CreateSolutionBody {
   @IsNumber()
@@ -19,13 +20,13 @@ export class CreateSolutionBody {
   @IsNotEmpty()
   description: string = '';
 
+  @Type(() => Number)
   @IsLatitude()
-  @Transform(({ value }) => parseFloat(value))
   @IsNotEmpty()
   lat: number;
 
+  @Type(() => Number)
   @IsLongitude()
-  @Transform(({ value }) => parseFloat(value))
   @IsNotEmpty()
   lng: number;
 }
@@ -35,3 +36,10 @@ export class CreateRejectionBody {
   @IsNotEmpty()
   message: string = '';
 }
+
+export interface AcceptSolutionResBody {
+  issue: IIssue;
+  solution: ISolution;
+}
+
+export interface ISolution {}

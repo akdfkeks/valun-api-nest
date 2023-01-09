@@ -40,18 +40,18 @@ export class CreateIssueBody {
   @IsNotEmpty()
   category: string = 'etc';
 
+  @Type(() => Number)
   @IsLatitude()
-  @Transform(({ value }) => parseFloat(value))
   @IsNotEmpty()
   lat: number;
 
+  @Type(() => Number)
   @IsLongitude()
-  @Transform(({ value }) => parseFloat(value))
   @IsNotEmpty()
   lng: number;
 }
 
-export interface IExtendedIssue {
+export interface IIssue {
   id: number;
   userId: string;
   status: string;
