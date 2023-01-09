@@ -8,6 +8,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { categoryParser } from 'src/util/issue';
 
 export class GetIssuesQuery {
   @Transform(({ value }: { value: string }) => {
@@ -16,13 +17,13 @@ export class GetIssuesQuery {
   @IsOptional()
   categories?: string[];
 
-  @Transform(({ value }: { value: string }) => parseFloat(value))
   @IsLatitude()
+  @Type(() => Number)
   @IsNotEmpty()
   lat: number;
 
-  @Transform(({ value }: { value: string }) => parseFloat(value))
   @IsLongitude()
+  @Type(() => Number)
   @IsNotEmpty()
   lng: number;
 }
@@ -40,13 +41,13 @@ export class CreateIssueBody {
   @IsNotEmpty()
   category: string = 'etc';
 
-  @Type(() => Number)
   @IsLatitude()
+  @Type(() => Number)
   @IsNotEmpty()
   lat: number;
 
-  @Type(() => Number)
   @IsLongitude()
+  @Type(() => Number)
   @IsNotEmpty()
   lng: number;
 }
@@ -84,13 +85,3 @@ const categoryJson = {
   비닐: 'vinyl',
   기타: 'etc',
 } as const;
-
-const categoryParser = (keys: string, obj: Record<string, string>) => {
-  const categoryList = Object.values(obj);
-  const refined = keys.split(',').filter((element) => {
-    return categoryList.includes(element);
-  });
-  return refined.length == 0 ? undefined : refined;
-};
-
-Array;

@@ -119,7 +119,14 @@ class IssueRepository {
     return await this.prisma.issue.findMany({
       where: { userId: userId, status: 'PENDING' },
       include: {
-        solutions: true,
+        ...categoryAndImage,
+        solutions: {
+          include: {
+            image: true,
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
       },
     });
   }

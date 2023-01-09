@@ -23,21 +23,21 @@ export class PrismaService
     /****************************/
     /*** TIME ZONE MIDDLEWARE ***/
     /****************************/
-    this.$use(async (params, next) => {
-      if (params.model !== 'Issue') return next(params);
+    // this.$use(async (params, next) => {
+    //   if (params.model !== 'Issue') return next(params);
 
-      const result = await next(params);
-      if (!result) return result;
+    //   const result = await next(params);
+    //   if (!result) return result;
 
-      if (params.action == 'findMany')
-        return result.map((issue) => {
-          issue.createdAt = this.toKST(issue.createdAt);
-          return issue;
-        });
+    //   if (params.action == 'findMany')
+    //     return result.map((issue) => {
+    //       issue.createdAt = this.toKST(issue.createdAt);
+    //       return issue;
+    //     });
 
-      result.createdAt = this.toKST(result.createdAt);
-      return result;
-    });
+    //   result.createdAt = this.toKST(result.createdAt);
+    //   return result;
+    // });
   }
 
   async onModuleInit() {

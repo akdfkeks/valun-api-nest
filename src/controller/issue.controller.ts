@@ -44,6 +44,10 @@ export class IssueController {
     };
   }
 
+  @Get('my') async getMyIssues(@Req() req: Request) {
+    return await this.issueService.findPendingIssues(req.user);
+  }
+
   // * Web : 최근 제보된 이슈를 조회합니다.
   @Get('samples')
   async getSampleIssues() {

@@ -1,12 +1,10 @@
+import { Solution as PSolution } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
-  IsArray,
-  IsInt,
   IsLatitude,
   IsLongitude,
   IsNotEmpty,
   IsNumber,
-  IsOptional,
   IsString,
 } from 'class-validator';
 import { IIssue } from './issue.dto';
@@ -42,4 +40,17 @@ export interface AcceptSolutionResBody {
   solution: ISolution;
 }
 
-export interface ISolution {}
+export interface IRawSolution extends PSolution {
+  image: { location: string };
+}
+
+export interface ISolution {
+  id: number;
+  userId: string;
+  description: string;
+  lat: number;
+  lng: number;
+  createdAt: Date;
+  imageUrl: string;
+  isMine: boolean;
+}
