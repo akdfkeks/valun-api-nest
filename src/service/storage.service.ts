@@ -65,6 +65,7 @@ export class StorageService {
     image: Express.Multer.File,
     options: { width?: number; height?: number },
   ) {
+    // 애초에 input 작으면 이미지가 커지는 문제
     try {
       return sharp(image.buffer).withMetadata().resize(options).toBuffer();
     } catch (err) {
