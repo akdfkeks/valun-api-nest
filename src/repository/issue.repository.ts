@@ -135,7 +135,7 @@ class IssueRepository {
   private getLatLngRange() {
     const KMPERLAT = 0.00899361453;
     const KMPERLNG = 0.01126126126;
-    const RADIUS = 500;
+    const RADIUS = 3;
     return { t: RADIUS * KMPERLAT, g: RADIUS * KMPERLNG };
   }
 }
