@@ -1,7 +1,6 @@
 import { Issue as PrismaIssue } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
-  IsArray,
   IsLatitude,
   IsLongitude,
   IsNotEmpty,
