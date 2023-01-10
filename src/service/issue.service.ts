@@ -81,29 +81,28 @@ export class IssueService {
     userId: string,
     getIssuesQuery: GetIssuesQuery,
   ) {
+    let r = [];
     const rawIssues = await this.issueRepository.findMany({
       ...getIssuesQuery,
       status: 'UNSOLVED',
       take: 10,
     });
+    if (rawIssues.length !== 0)
+      r = rawIssues.map((issue) => rawIssueToDto(userId, issue));
 
-    if (rawIssues.length == 0) return [];
-
-    const iIssues = rawIssues.map((issue) => rawIssueToDto(userId, issue));
-
-    return { message: '사용자 주변 최근 이슈 목록', data: { issues: iIssues } };
+    return { message: '사용자 주변 최근 이슈 목록', data: { issues: r } };
   }
 
   public async findNearbyIssues(userId: string, getIssuesDto: GetIssuesQuery) {
+    let r = [];
     const rawIssues = await this.issueRepository.findMany({
       ...getIssuesDto,
       status: 'UNSOLVED',
     });
-    if (rawIssues.length == 0) return [];
+    if (rawIssues.length !== 0)
+      r = rawIssues.map((issue) => rawIssueToDto(userId, issue));
 
-    const iIssues = rawIssues.map((issue) => rawIssueToDto(userId, issue));
-
-    return { message: '사용자 주변 이슈 목록', data: { issues: iIssues } };
+    return { message: '사용자 주변 이슈 목록', data: { issues: r } };
   }
 
   public async findIssueById(userId: string, issueId: number) {
