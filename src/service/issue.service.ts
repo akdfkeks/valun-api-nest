@@ -3,6 +3,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { IssueStatus } from '@prisma/client';
 import { CreateImageDto } from 'src/interface/dto/image.dto';
 import {
   CreateIssueBody,
@@ -34,7 +35,7 @@ export class IssueService {
     return await this.issueRepository.create(userId, issue, upload);
   }
 
-  public async updateIssueStatus(issueId, status) {
+  public async updateIssueStatus(issueId, status: IssueStatus) {
     return await this.issueRepository.updateOne({ id: issueId, status });
   }
 

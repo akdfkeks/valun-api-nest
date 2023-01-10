@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -25,11 +26,10 @@ import { SolutionService } from 'src/service/solution.service';
 export class SolutionController {
   constructor(private solutionService: SolutionService) {}
 
-  @Post(':id/allow')
+  @Post('accept')
   async postAllow(
-    @Param('id') id: number,
+    @Query('id', new ParseIntPipe()) id: number,
     @Req() req: Request,
-    // @Body() accept: CreateAllowBody,
   ) {
     return this.solutionService.acceptSolution(req.user, id);
   }

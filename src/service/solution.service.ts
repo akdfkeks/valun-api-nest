@@ -34,24 +34,24 @@ export class SolutionService {
      */
     if (!issue || issue.status !== 'UNSOLVED')
       throw new BadRequestException('해결 시도가 불가능한 이슈입니다.');
+    // 같으면 에러가 나야함
     this.checkPermit(userId, issue.userId, false);
 
-    const upload: CreateImageDto = await this.storageService.upload(image, {
-      resize: { width: 1080 },
-    });
-
-    // 여기좀 야물딱지게 고치자~
-    Promise.all([
-      this.solutionRepository.create(userId, solutionBody, upload),
-      this.issueService.updateIssueStatus(issue.id, 'PENDING'),
-    ])
-      .then(([solution, issue]) => {})
-      .catch((err) => {
-        console.log(err);
-        throw err;
+    this.storageService
+      .upload(image, { resize: { width: 1080 } })
+      .then((uploaded) => {
+        Promise.all([
+          this.solutionRepository.create(userId, solutionBody, uploaded),
+          this.issueService.updateIssueStatus(issue.id, 'PENDING'),
+        ])
+          .then(([solution, issue]) => {})
+          .catch((err) => {
+            console.log(err);
+            throw err;
+          });
       });
 
-    return { message: '해결 등록 성공', data: null };
+    return { message: '해결 등록 성공', data: {} };
   }
 
   async acceptSolution(userId: string, solutionId: number) {
@@ -59,16 +59,19 @@ export class SolutionService {
     // 이걸 비교하는것보다 그냥 userid 로 solution 이 달린 이슈를 검색해봐?
     if (!solution || solution.issue.status !== 'PENDING')
       throw new BadRequestException('잘못된 요청입니다.');
+    // 다르면 에러가 나야함;
     this.checkPermit(userId, solution.issue.userId, true);
 
-    const r = await this.issueService.updateIssueStatus(
-      solution.issueId,
-      'SOLVED',
-    );
+    this.issueService
+      .updateIssueStatus(solution.issueId, 'SOLVED')
+      .then((result) => {
+        // 빗자루
+      })
+      .catch((err) => {});
 
     return {
-      message: `이슈 ${solution.issueId} 에 대한 해결 요청을 수락하였습니다.`,
-      data: null,
+      message: `Issue ID : ${solution.issueId} 에 대한 해결 요청을 수락하였습니다.`,
+      data: {},
     };
   }
 
@@ -77,11 +80,11 @@ export class SolutionService {
     id: number,
     rejection: CreateRejectionBody,
   ) {
-    return { message: 'asdf', data: {} };
+    return { message: 'reject', data: {} };
   }
 
   private checkPermit(requester: string, owner: string, same: boolean) {
-    if (requester !== owner && same)
+    if (!(requester == owner || same))
       throw new UnauthorizedException('권한이 없습니다.');
   }
 

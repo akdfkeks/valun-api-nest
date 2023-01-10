@@ -25,7 +25,7 @@ export class SolutionRepository {
   }
 
   public async findOneById(id: number) {
-    return await this.prisma.solution.findUniqueOrThrow({
+    return await this.prisma.solution.findUnique({
       where: { id },
       include: {
         issue: true,
