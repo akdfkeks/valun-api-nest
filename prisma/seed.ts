@@ -18,9 +18,9 @@ const cat = [
 ];
 
 async function main() {
-  await createUsers(10);
-  await createCategories(cat);
-  await createIssues(1000);
+  // await createUsers(10);
+  // await createCategories(cat);
+  await createIssues(2000);
 }
 
 function getRandomInt(min, max) {
