@@ -37,7 +37,7 @@ export class SolutionService {
       throw new BadRequestException('해결 시도가 불가능한 이슈입니다.');
 
     checkBoolean(
-      checkValues(userId, issue.userId, (a, b) => a !== b),
+      checkValues(userId, issue.userId, (a, b) => !(a == b)),
       new BadRequestException('내가 제보한 이슈는 해결할 수 없습니다.'),
     );
 
