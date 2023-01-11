@@ -52,3 +52,10 @@ export const findManyByUserIdValidator = () => {};
 
 // Update
 // Delete
+
+export interface ISearchByLocal {
+  lat?: number;
+  lng?: number;
+  categories?: string[];
+  take?: number;
+}

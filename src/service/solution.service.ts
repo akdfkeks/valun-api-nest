@@ -37,7 +37,7 @@ export class SolutionService {
       throw new BadRequestException('해결 시도가 불가능한 이슈입니다.');
 
     checkBoolean(
-      checkValues(userId, issue.userId, (a, b) => a == b),
+      checkValues(userId, issue.userId, (a, b) => a !== b),
       new BadRequestException('내가 제보한 이슈는 해결할 수 없습니다.'),
     );
 
@@ -55,7 +55,10 @@ export class SolutionService {
           });
       });
 
-    return { message: '해결 등록 성공', data: {} };
+    return {
+      message: `이슈 ID ${issue.id} 에 대한 해결을 요청하였습니다.`,
+      data: null,
+    };
   }
 
   async acceptSolution(userId: string, solutionId: number) {
@@ -65,7 +68,7 @@ export class SolutionService {
       throw new BadRequestException('잘못된 요청입니다.');
 
     checkBoolean(
-      checkValues(userId, solution.issue.userId, (a, b) => a !== b),
+      checkValues(userId, solution.issue.userId, (a, b) => a == b),
       new UnauthorizedException('권한이 없습니다.'),
     );
 

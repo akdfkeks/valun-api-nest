@@ -1,17 +1,7 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
-import { Issue, IssueStatus } from '@prisma/client';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { IssueStatus } from '@prisma/client';
 import { CreateImageDto } from 'src/interface/dto/image.dto';
-import {
-  CreateIssueBody,
-  GetIssuesQuery,
-  IIssue,
-  IssueIncludable,
-  IssueStatusQuery,
-} from 'src/interface/dto/issue.dto';
+import { CreateIssueBody, GetIssuesQuery } from 'src/interface/dto/issue.dto';
 import IssueRepository from 'src/repository/issue.repository';
 import { rawIssueToDto } from 'src/util/issue';
 import { rawSolutionToDto } from 'src/util/solution';
