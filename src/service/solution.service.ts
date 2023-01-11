@@ -9,6 +9,7 @@ import {
   CreateSolutionBody,
 } from 'src/interface/dto/solution.dto';
 import SolutionRepository from 'src/repository/solution.repository';
+import { checkBoolean, checkValues } from 'src/util/function';
 import { IssueService } from './issue.service';
 import { StorageService } from './storage.service';
 
@@ -34,8 +35,11 @@ export class SolutionService {
      */
     if (!issue || issue.status !== 'UNSOLVED')
       throw new BadRequestException('해결 시도가 불가능한 이슈입니다.');
-    // 같으면 에러가 나야함
-    this.checkPermit(userId, issue.userId, false);
+
+    checkBoolean(
+      checkValues(userId, issue.userId, (a, b) => a == b),
+      new BadRequestException('내가 제보한 이슈는 해결할 수 없습니다.'),
+    );
 
     this.storageService
       .upload(image, { resize: { width: 1080 } })
@@ -59,8 +63,11 @@ export class SolutionService {
     // 이걸 비교하는것보다 그냥 userid 로 solution 이 달린 이슈를 검색해봐?
     if (!solution || solution.issue.status !== 'PENDING')
       throw new BadRequestException('잘못된 요청입니다.');
-    // 다르면 에러가 나야함;
-    this.checkPermit(userId, solution.issue.userId, true);
+
+    checkBoolean(
+      checkValues(userId, solution.issue.userId, (a, b) => a !== b),
+      new UnauthorizedException('권한이 없습니다.'),
+    );
 
     this.issueService
       .updateIssueStatus(solution.issueId, 'SOLVED')
@@ -82,13 +89,6 @@ export class SolutionService {
   ) {
     return { message: 'reject', data: {} };
   }
-
-  private checkPermit(requester: string, owner: string, same: boolean) {
-    if (!(requester == owner || same))
-      throw new UnauthorizedException('권한이 없습니다.');
-  }
-
-  private checkSolutionPermit() {}
 
   // private checkDistance(
   //   a: { lat: number; lng: number },

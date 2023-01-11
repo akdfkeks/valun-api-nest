@@ -26,26 +26,23 @@ import { IssueService } from 'src/service/issue.service';
 export class IssueController {
   constructor(private issueService: IssueService) {}
 
-  @UseGuards(StrictJwtGuard)
-  @UseInterceptors(FileInterceptor('image'))
   @Post('')
+  @UseInterceptors(FileInterceptor('image'))
+  @UseGuards(StrictJwtGuard)
   async postIssue(
     @Req() req: Request,
     @Body() issue: CreateIssueBody,
     @UploadedFile() image: Express.Multer.File,
   ) {
-    const created = await this.issueService.createIssue(req.user, issue, image);
-    return {
-      message: '이슈를 등록하였습니다.',
-      data: {
-        id: created.id,
-        createdAt: created.createdAt,
-      },
-    };
+    return await this.issueService.createIssue(req.user, issue, image);
   }
 
-  @Get('my') async getMyIssues(@Req() req: Request) {
-    return await this.issueService.findPendingIssues(req.user);
+  @Get('around')
+  async getAroundIssues(
+    @Req() req: Request,
+    @Query() getIssuesDto: GetIssuesQuery,
+  ) {
+    return await this.issueService.findNearbyIssues(req.user, getIssuesDto);
   }
 
   // * Web : 최근 제보된 이슈를 조회합니다.
@@ -57,10 +54,12 @@ export class IssueController {
   @Get('recent')
   async getRecentIssues(
     @Req() req: Request,
-    @Query() getIssuesQuery: GetIssuesQuery,
+    @Query() getIssuesQuery: Omit<GetIssuesQuery, 'categories'>,
   ) {
     return await this.issueService.findRecentIssues(req.user, getIssuesQuery);
   }
+
+  // * APP : 사용자의 위치를 기준으로 특정 카테고리에 속하는 미해결 이슈를 반환합니다.
 
   // * APP : 이슈 고유 ID 로 특정한 이슈를 조회합니다.
   @Get(':id')
@@ -70,14 +69,5 @@ export class IssueController {
     // @Query() field: GetIssueQuery = undefined,
   ) {
     return await this.issueService.findIssueById(req.user, id);
-  }
-
-  // * APP : 사용자의 위치를 기준으로 특정 카테고리에 속하는 미해결 이슈를 반환합니다.
-  @Get('')
-  async getNearbyIssues(
-    @Req() req: Request,
-    @Query() getIssuesDto: GetIssuesQuery,
-  ) {
-    return await this.issueService.findNearbyIssues(req.user, getIssuesDto);
   }
 }

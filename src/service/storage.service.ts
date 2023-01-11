@@ -47,6 +47,7 @@ export class StorageService {
           Body: resizedImageBuffer,
         })
         .promise();
+      // @TODO : logging
       return {
         format: ext,
         sourceName,

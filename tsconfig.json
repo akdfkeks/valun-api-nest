@@ -17,11 +17,7 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "plugins": [
-      {
-        "transform": "typia/lib/transform"
-      }
-    ],
+    "plugins": [],
     "strict": true
   }
 }
