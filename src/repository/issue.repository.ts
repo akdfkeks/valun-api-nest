@@ -1,9 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { IssueStatus } from '@prisma/client';
+import {
+  Issue,
+  IssueCategory,
+  IssueComment,
+  IssueImage,
+  IssueStatus,
+  Solution,
+  User,
+} from '@prisma/client';
 import { CreateImageDto } from 'src/interface/dto/image.dto';
 import {
   CreateIssueBody,
   IExtendedRawIssue,
+  IssueIncludable,
 } from 'src/interface/dto/issue.dto';
 import { PrismaService } from 'src/service/prisma.service';
 import {
@@ -53,6 +62,46 @@ class IssueRepository {
       },
     });
   }
+
+  public async findManyUnsolvedsByUserId(
+    userId: string,
+  ): Promise<
+    (Issue & Omit<IssueIncludable, 'user' | 'issueComments' | 'solutions'>)[]
+  > {
+    return await this.prisma.issue.findMany({
+      where: { userId, status: 'UNSOLVED' },
+      include: {
+        category: true,
+        image: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  public async findManyWithSolutionsByUserId(
+    userId: string,
+    status: 'PENDING' | 'SOLVED',
+  ): Promise<(Issue & Omit<IssueIncludable, 'user' | 'issueComments'>)[]> {
+    return await this.prisma.issue.findMany({
+      where: { userId, status },
+      include: {
+        category: true,
+        image: true,
+        solutions: {
+          include: {
+            image: true,
+          },
+          orderBy: {
+            id: 'desc',
+          },
+          take: 1,
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  //----------------------------------------------------------------
 
   public async findOneById(id: number) {
     return await this.prisma.issue.findUnique({
@@ -115,9 +164,12 @@ class IssueRepository {
     });
   }
 
-  public async findByUserIdWithSolution(userId: string) {
+  public async findByUserIdWithSolution(
+    userId: string,
+    status: IssueStatus,
+  ): Promise<(Issue & { image: any; category: any; solutions: any })[]> {
     return await this.prisma.issue.findMany({
-      where: { userId: userId, status: 'PENDING' },
+      where: { userId: userId, status },
       include: {
         ...categoryAndImage,
         solutions: {

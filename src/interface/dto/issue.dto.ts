@@ -1,4 +1,13 @@
-import { Issue as PrismaIssue } from '@prisma/client';
+import {
+  Issue as PrismaIssue,
+  IssueCategory,
+  IssueComment,
+  IssueImage,
+  IssueStatus,
+  Solution,
+  SolutionImage,
+  User,
+} from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
   IsLatitude,
@@ -25,6 +34,11 @@ export class GetIssuesQuery {
   @Type(() => Number)
   @IsNotEmpty()
   lng: number;
+}
+
+export class IssueStatusQuery {
+  @IsNotEmpty()
+  status: IssueStatus;
 }
 
 export class CreateIssueBody {
@@ -68,6 +82,14 @@ export interface IExtendedRawIssue extends PrismaIssue {
   category: { name: string };
   image: { location: string };
 }
+
+export type IssueIncludable = {
+  user: User;
+  image: IssueImage;
+  category: IssueCategory;
+  solutions: (Solution & { image: SolutionImage })[];
+  issueComments: IssueComment[];
+};
 
 // DB 에서 읽어오던 JSON 으로 관리하던..고민중
 const categoryJson = {

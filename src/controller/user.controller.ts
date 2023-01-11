@@ -13,10 +13,17 @@ import { CreateUserDto } from 'src/interface/dto/user.dto';
 import { StrictJwtGuard } from 'src/provider/guard/strict-jwt.guard';
 import { UserService } from 'src/service/user.service';
 import { Request } from 'express';
+import { IssueService } from 'src/service/issue.service';
+import { Query } from '@nestjs/common';
+import { IssueStatus } from '@prisma/client';
+import { IssueStatusQuery } from 'src/interface/dto/issue.dto';
 
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly issueService: IssueService,
+  ) {}
 
   @UseInterceptors(FileInterceptor('image'))
   @Post('signup')
@@ -33,8 +40,12 @@ export class UserController {
   }
 
   @UseGuards(StrictJwtGuard)
-  @Get('myprofile')
+  @Get('my/profile')
   async getMyProfile(@Req() req: Request) {
     return await this.userService.findUserProfileWithNoti(req.user);
+  }
+
+  @Get('my/issues') async getMyIssues(@Req() req: Request) {
+    return await this.issueService.findMyIssues(req.user);
   }
 }

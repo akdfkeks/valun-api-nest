@@ -3,18 +3,18 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { IssueStatus } from '@prisma/client';
+import { Issue, IssueStatus } from '@prisma/client';
 import { CreateImageDto } from 'src/interface/dto/image.dto';
 import {
   CreateIssueBody,
   GetIssuesQuery,
   IIssue,
-  IExtendedRawIssue,
+  IssueIncludable,
+  IssueStatusQuery,
 } from 'src/interface/dto/issue.dto';
 import IssueRepository from 'src/repository/issue.repository';
 import { rawIssueToDto } from 'src/util/issue';
 import { rawSolutionToDto } from 'src/util/solution';
-// import { toDto } from 'src/util/issue';
 import { StorageService } from './storage.service';
 
 @Injectable()
@@ -32,7 +32,15 @@ export class IssueService {
     const upload: CreateImageDto = await this.storageService.upload(image, {
       resize: { width: 1080 },
     });
-    return await this.issueRepository.create(userId, issue, upload);
+    const created = await this.issueRepository.create(userId, issue, upload);
+
+    return {
+      message: '이슈를 등록하였습니다.',
+      data: {
+        id: created.id,
+        createdAt: created.createdAt,
+      },
+    };
   }
 
   public async updateIssueStatus(issueId, status: IssueStatus) {
@@ -54,37 +62,64 @@ export class IssueService {
     };
   }
 
-  public async findPendingIssues(userId: string) {
-    const pendings = await this.issueRepository.findByUserIdWithSolution(
-      userId,
-    );
-    let pd = [];
-    if (pendings.length > 0) {
-      pd = pendings
-        .map((e) => {
-          const { solutions, ...issue } = e;
-          return {
-            issue: rawIssueToDto(userId, issue),
-            solution: rawSolutionToDto(userId, solutions[0]),
-          };
-        })
-        .filter(({ issue, solution }) => issue && solution);
-    }
+  public async findMyIssues(userId: string) {
+    const [rawUnsolveds, rawPendings, rawSolveds] = await Promise.allSettled([
+      await this.issueRepository.findManyByUserId(userId),
+      await this.issueRepository.findByUserIdWithSolution(userId, 'PENDING'),
+      await this.issueRepository.findByUserIdWithSolution(userId, 'SOLVED'),
+    ]).then((result) => {
+      return result.map((r) => {
+        return r.status == 'fulfilled' ? r.value : [];
+      });
+    });
+
+    const unsolveds =
+      rawUnsolveds.length !== 0
+        ? rawUnsolveds.map((r) => rawIssueToDto(userId, r))
+        : [];
+    const pendings =
+      rawPendings.length !== 0
+        ? rawPendings
+            .map((r) => {
+              const { solutions, ...issue } = r;
+              return {
+                issue: rawIssueToDto(userId, issue),
+                solution: rawSolutionToDto(userId, solutions[0]),
+              };
+            })
+            .filter(({ issue, solution }) => issue && solution)
+        : [];
+    const solveds =
+      rawSolveds.length !== 0
+        ? rawSolveds
+            .map((r) => {
+              const { solutions, ...issue } = r;
+              return {
+                issue: rawIssueToDto(userId, issue),
+                solution: rawSolutionToDto(userId, solutions[0]),
+              };
+            })
+            .filter(({ issue, solution }) => issue && solution)
+        : [];
+
     return {
-      message: '되노',
+      message: `my issues`,
       data: {
-        pendings: pd,
+        unsolveds,
+        pendings,
+        solveds,
       },
     };
   }
 
   public async findRecentIssues(
     userId: string,
-    getIssuesQuery: GetIssuesQuery,
+    getIssuesQuery: Omit<GetIssuesQuery, 'categories'>,
   ) {
     let r = [];
     const rawIssues = await this.issueRepository.findMany({
       ...getIssuesQuery,
+      categories: undefined,
       status: 'UNSOLVED',
       take: 10,
     });
@@ -113,15 +148,5 @@ export class IssueService {
     const issue = rawIssueToDto(userId, rawIssue);
 
     return { message: '단일 이슈', data: { issue } };
-  }
-
-  public async findIssuesByUserId(userId: string) {
-    let issues: IIssue[] = [];
-
-    const rawIssues = await this.issueRepository.findManyByUserId(userId);
-    if (rawIssues.length !== 0)
-      rawIssues.map((issue) => rawIssueToDto(userId, issue));
-
-    return { message: '', data: { issues } };
   }
 }
