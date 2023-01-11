@@ -29,7 +29,18 @@ export class IssueRepository {
   /**
    * 이슈를 생성합니다.
    */
-  async create(userId: string, issue: CreateIssueBody, image: IUploadedImage) {}
+  async create(userId: string, issue: CreateIssueBody, image: IUploadedImage) {
+    return await this.issue.create({
+      data: {
+        user: { connect: { id: userId } },
+        category: { connect: { name: issue.category } },
+        description: issue.description,
+        lat: issue.lat,
+        lng: issue.lng,
+        image: { create: image },
+      },
+    });
+  }
 
   /**
    * Issue ID 를 통해 특정 이슈를 조회합니다.
@@ -41,6 +52,10 @@ export class IssueRepository {
 
   /**
    * 위도, 경도, 카테고리(Optional) 를 기준으로 "UNSOLVED" 상태의 이슈를 조회합니다.
+   * @param params: Object { lat, lng, categories, take }
+   * @arg lat 위도
+   * @arg lng 경도
+   * @arg categories 조회할 카테고리
    */
   async findManyUnsolvedByLocation(
     params: ISearchByLocal,
