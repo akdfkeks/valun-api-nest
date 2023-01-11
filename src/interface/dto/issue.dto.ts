@@ -91,6 +91,16 @@ export type IssueIncludable = {
   issueComments: IssueComment[];
 };
 
+export interface ISolvedIncludable extends IIssueIncludable {
+  solutions: (Solution & { image: SolutionImage })[];
+}
+
+export interface IIssueIncludable {
+  user?: User;
+  image: IssueImage;
+  category: IssueCategory;
+}
+
 // DB 에서 읽어오던 JSON 으로 관리하던..고민중
 const categoryJson = {
   플라스틱: 'plastic',
