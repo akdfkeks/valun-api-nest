@@ -54,7 +54,7 @@ export class IssueController {
   @Get('recent')
   async getRecentIssues(
     @Req() req: Request,
-    @Query() getIssuesQuery: Omit<GetIssuesQuery, 'categories'>,
+    @Query() getIssuesQuery: GetIssuesQuery,
   ) {
     return await this.issueService.findRecentIssues(req.user, getIssuesQuery);
   }

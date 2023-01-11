@@ -114,7 +114,7 @@ export class IssueService {
 
   public async findRecentIssues(
     userId: string,
-    getIssuesQuery: Omit<GetIssuesQuery, 'categories'>,
+    getIssuesQuery: GetIssuesQuery,
   ) {
     let r = [];
     const rawIssues = await this.issueRepository.findMany({
