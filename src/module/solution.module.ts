@@ -9,5 +9,6 @@ import { IssueModule } from './issue.module';
   imports: [IssueModule],
   controllers: [SolutionController],
   providers: [SolutionService, SolutionRepository],
+  exports: [SolutionService],
 })
 export class SolutionModule {}

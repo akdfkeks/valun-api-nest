@@ -39,9 +39,26 @@ export class SolutionRepository {
     });
   }
 
-  public async findManyByUserId(id: string) {
+  public async findManyByUserId(userId: string) {
     return await this.prisma.solution.findMany({
-      where: { userId: id },
+      where: { userId },
+      select: {
+        issue: {
+          include: {
+            category: true,
+            image: true,
+            solutions: {
+              include: {
+                image: true,
+              },
+              orderBy: {
+                id: 'desc',
+              },
+              take: 1,
+            },
+          },
+        },
+      },
     });
   }
 }

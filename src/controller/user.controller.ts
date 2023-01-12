@@ -17,12 +17,14 @@ import { IssueService } from 'src/service/issue.service';
 import { Query } from '@nestjs/common';
 import { IssueStatus } from '@prisma/client';
 import { IssueStatusQuery } from 'src/interface/dto/issue.dto';
+import { SolutionService } from 'src/service/solution.service';
 
 @Controller('user')
 export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly issueService: IssueService,
+    private readonly solutionService: SolutionService,
   ) {}
 
   @UseInterceptors(FileInterceptor('image'))
@@ -45,7 +47,15 @@ export class UserController {
     return await this.userService.findUserProfileWithNoti(req.user);
   }
 
-  @Get('my/issues') async getMyIssues(@Req() req: Request) {
+  @UseGuards(StrictJwtGuard)
+  @Get('my/issues')
+  async getMyIssues(@Req() req: Request) {
     return await this.issueService.findMyIssues(req.user);
+  }
+
+  @UseGuards(StrictJwtGuard)
+  @Get('my/solutions')
+  async getMySolutions(@Req() req: Request) {
+    return await this.solutionService.findMySolutionsWithIssue(req.user);
   }
 }

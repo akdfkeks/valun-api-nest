@@ -10,6 +10,8 @@ import {
 } from 'src/interface/dto/solution.dto';
 import SolutionRepository from 'src/repository/solution.repository';
 import { checkBoolean, checkValues } from 'src/util/function';
+import { rawIssueToDto } from 'src/util/issue';
+import { rawSolutionToDto } from 'src/util/solution';
 import { IssueService } from './issue.service';
 import { StorageService } from './storage.service';
 
@@ -91,6 +93,39 @@ export class SolutionService {
     rejection: CreateRejectionBody,
   ) {
     return { message: 'reject', data: {} };
+  }
+
+  // 임시...아예 새로 만들기
+  public async findMySolutionsWithIssue(userId: string) {
+    let pendings = [];
+    let solveds = [];
+    const a = await this.solutionRepository.findManyByUserId(userId);
+    if (a.length !== 0) {
+      const issues = a.map(({ issue }) => issue);
+      const pds = issues.filter((issue) => issue.status == 'PENDING');
+      const svds = issues.filter((issue) => issue.status == 'SOLVED');
+      pendings = pds.map((r) => {
+        const { solutions, ...issue } = r;
+        return {
+          issue: rawIssueToDto(userId, issue),
+          solution: rawSolutionToDto(userId, solutions[0]),
+        };
+      });
+      solveds = svds.map((r) => {
+        const { solutions, ...issue } = r;
+        return {
+          issue: rawIssueToDto(userId, issue),
+          solution: rawSolutionToDto(userId, solutions[0]),
+        };
+      });
+    }
+    return {
+      message: '내가 해결한 이슈',
+      data: {
+        pendings,
+        solveds,
+      },
+    };
   }
 
   // private checkDistance(
