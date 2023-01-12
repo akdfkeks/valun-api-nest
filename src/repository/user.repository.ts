@@ -16,6 +16,10 @@ class UserRepository {
     return await this.prisma.user.findUnique({ where: { id } });
   }
 
+  async findByNick(nick: string) {
+    return await this.prisma.user.findUnique({ where: { nick } });
+  }
+
   async findByUud(uuid: string) {
     return await this.prisma.user.findUnique({
       where: { uuid },

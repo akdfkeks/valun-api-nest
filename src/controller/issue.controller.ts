@@ -20,18 +20,13 @@ import {
 import { StrictJwtGuard } from 'src/provider/guard/strict-jwt.guard';
 import { IssueService } from 'src/service/issue.service';
 
-/**
- * Controller method naming rules
- * (HTTP method type) + (Resource name)
- */
-
 @Controller('issues')
 export class IssueController {
   constructor(private issueService: IssueService) {}
 
-  @Post('')
   @UseInterceptors(FileInterceptor('image'))
   @UseGuards(StrictJwtGuard)
+  @Post('')
   async postIssue(
     @Req() req: Request,
     @Body() issue: CreateIssueBody,
@@ -40,6 +35,9 @@ export class IssueController {
     return await this.issueService.createIssue(req.user, issue, image);
   }
 
+  /**
+   * 사용자의 위치를 기반으로 주변에 존재하는 특정 카테고리의 이슈를 조회합니다.
+   */
   @Get('around')
   async getAroundIssues(
     @Req() req: Request,
@@ -54,6 +52,7 @@ export class IssueController {
     return await this.issueService.findSampleIssues();
   }
 
+  @UseGuards(StrictJwtGuard)
   @Get('recent')
   async getRecentIssues(
     @Req() req: Request,

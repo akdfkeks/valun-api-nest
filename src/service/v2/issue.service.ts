@@ -1,9 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Multer } from 'multer';
-import { CreateIssueBody } from 'src/common/interface/dto/issue.dto';
-import { IssueRepository } from 'src/repository/_issue.repository';
+import {
+  CreateIssueBody,
+  GetIssuesQuery,
+} from 'src/common/interface/dto/issue.dto';
+import { IssueRepository } from 'src/repository/v2/issue.repository';
 import { exclude } from 'src/common/util/function';
-import { StorageService } from './storage.service';
+import { StorageService } from '../storage.service';
 
 @Injectable()
 export class IssueService {
@@ -66,7 +69,7 @@ export class IssueService {
     };
   }
 
-  public async findAroundIssues(userId: string) {
+  public async findAroundIssues(userId: string, query: GetIssuesQuery) {
     const arounds = await this.issueRepository.findManyUnsolvedByLocation({
       lat: 37.12345,
       lng: 37.12345,

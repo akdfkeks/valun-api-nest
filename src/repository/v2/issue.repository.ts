@@ -7,7 +7,7 @@ import {
   ISolvedIncludable,
 } from 'src/common/interface/dto/issue.dto';
 import { PrismaService } from 'src/service/prisma.service';
-import { ISearchByLocal } from './validator/issue.validator';
+import { ISearchByLocal } from '../validator/issue.validator';
 
 const LATPERKM = 0.00899361453;
 const LNGPERKM = 0.01126126126;

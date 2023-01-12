@@ -22,7 +22,7 @@ export class AuthService {
   }
 
   private async validateUser(reqId: string, reqPw: string): Promise<any> {
-    const user = await this.userService.findUniqueUser(reqId);
+    const user = await this.userService.findUniqueUserById(reqId);
 
     if (!user) throw new UnauthorizedException('존재하지 않는 회원입니다.');
 

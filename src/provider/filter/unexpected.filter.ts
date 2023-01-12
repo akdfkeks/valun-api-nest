@@ -12,8 +12,8 @@ export class UnExpectedExceptionFilter implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost) {
     const { message, name } = exception;
     const statusCode = 500;
-    console.log(exception);
-    this.logger.error(message);
+    // console.log(exception);
+    // this.logger.error(message);
 
     // const context = host.switchToHttp();
     const res = host.switchToHttp().getResponse<Response>();

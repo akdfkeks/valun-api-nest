@@ -17,8 +17,6 @@ import { SolutionModule } from './solution.module';
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(RequestLogger).forRoutes('*');
-    consumer
-      .apply(AuthMiddleware)
-      .forRoutes({ path: '*', method: RequestMethod.ALL });
+    consumer.apply(AuthMiddleware).forRoutes('*');
   }
 }
