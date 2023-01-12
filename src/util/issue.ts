@@ -2,6 +2,7 @@ import { Issue, Solution, SolutionImage } from '@prisma/client';
 import {
   IExtendedRawIssue as IRawIssue,
   IIssue,
+  IIssueIncludable,
   IssueIncludable,
 } from 'src/interface/dto/issue.dto';
 
@@ -52,3 +53,9 @@ export const transformIssue = (
 export const transformSolution = (
   input: Solution & { image: SolutionImage },
 ) => {};
+
+const flatIssue = (
+  issue: Omit<Issue & IIssueIncludable, 'user' | 'issueCategoryId'>,
+) => {
+  return {};
+};

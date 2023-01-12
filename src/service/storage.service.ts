@@ -18,9 +18,7 @@ interface UploadOptions {
 @Injectable()
 export class StorageService {
   private storage: S3;
-  constructor() {}
-
-  onModuleInit() {
+  constructor() {
     this.storage = new S3({
       accessKeyId: process.env.S3_ACCESS_KEY as string,
       secretAccessKey: process.env.S3_SECRET_KEY as string,
@@ -28,14 +26,23 @@ export class StorageService {
     });
   }
 
-  async upload(
+  onModuleInit() {}
+
+  public async upload(
     file: Express.Multer.File,
     options?: UploadOptions,
   ): Promise<CreateImageDto> {
-    if (!file) throw new BadRequestException('사진이 없습니다.');
-    // if file is not typeof image
+    // 에러처리 싹다 고쳐야할듯
+    if (!file)
+      throw new BadRequestException(
+        '(.jpeg, .jpg, .png) 형식의 사진을 첨부해야합니다.',
+      );
     const { size: sourceSize, originalname: sourceName } = file;
     const ext = path.extname(sourceName);
+    if (!['.jpeg', 'jpg', 'png'].includes(ext))
+      throw new BadRequestException(
+        '(.jpeg, .jpg, .png) 형식의 사진만 사용할 수 있습니다.',
+      );
     const regularName = new Date().valueOf() + ext;
     const resizedImageBuffer = await this.resizeImage(file, options.resize);
 
@@ -57,8 +64,8 @@ export class StorageService {
         location: uploaded.Location,
       };
     } catch (err) {
-      // console.log(err);
-      throw err;
+      console.log(err);
+      throw new InternalServerErrorException('사진 업로드 실패');
     }
   }
 
@@ -66,11 +73,11 @@ export class StorageService {
     image: Express.Multer.File,
     options: { width?: number; height?: number },
   ) {
-    // 애초에 input 작으면 이미지가 커지는 문제
+    // Bug: input 작으면 이미지가 커지는 문제가 있음
     try {
       return sharp(image.buffer).withMetadata().resize(options).toBuffer();
     } catch (err) {
-      throw new InternalServerErrorException('이미지 압축 실패');
+      throw new InternalServerErrorException('사진 압축 실패');
     }
   }
 }

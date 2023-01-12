@@ -18,3 +18,18 @@ export const seperate = (object: Object, ...keys: string[]) => {
 
   return rst;
 };
+
+export const exclude = <T, Key extends keyof T>(
+  object: T,
+  keys: Key[],
+): Omit<T, Key> => {
+  for (const key of keys) delete object[key];
+  return object;
+};
+
+export const flat = <T extends Object, K extends keyof T>(
+  object: T,
+  keys: K[],
+) => {
+  // for(const key of keys) object.hasOwnProperty(key)?object[key] instanceof Object?
+};

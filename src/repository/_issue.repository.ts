@@ -56,6 +56,7 @@ export class IssueRepository {
    * @arg lat 위도
    * @arg lng 경도
    * @arg categories 조회할 카테고리
+   * @arg take 조회할 이슈의 수
    */
   async findManyUnsolvedByLocation(
     params: ISearchByLocal,
