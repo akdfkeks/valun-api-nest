@@ -1,4 +1,4 @@
-import { IRawSolution, ISolution } from 'src/interface/dto/solution.dto';
+import { IRawSolution, ISolution } from 'src/common/interface/dto/solution.dto';
 
 export const rawSolutionToDto = (
   userId: string,

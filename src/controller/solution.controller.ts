@@ -16,7 +16,7 @@ import { Request } from 'express';
 import {
   CreateRejectionBody,
   CreateSolutionBody,
-} from 'src/interface/dto/solution.dto';
+} from 'src/common/interface/dto/solution.dto';
 import { StrictJwtGuard } from 'src/provider/guard/strict-jwt.guard';
 import { IssueService } from 'src/service/issue.service';
 import { SolutionService } from 'src/service/solution.service';

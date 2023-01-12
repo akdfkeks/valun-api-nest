@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateImageDto } from 'src/interface/dto/image.dto';
-import { CreateSolutionBody } from 'src/interface/dto/solution.dto';
+import { CreateImageDto } from 'src/common/interface/dto/image.dto';
+import { CreateSolutionBody } from 'src/common/interface/dto/solution.dto';
 import { PrismaService } from 'src/service/prisma.service';
 
 @Injectable()

@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Issue, IssueStatus, Prisma } from '@prisma/client';
-import { IUploadedImage } from 'src/interface/dto/image.dto';
+import { IUploadedImage } from 'src/common/interface/dto/image.dto';
 import {
   CreateIssueBody,
   IIssueIncludable,
   ISolvedIncludable,
-} from 'src/interface/dto/issue.dto';
+} from 'src/common/interface/dto/issue.dto';
 import { PrismaService } from 'src/service/prisma.service';
 import { ISearchByLocal } from './validator/issue.validator';
 

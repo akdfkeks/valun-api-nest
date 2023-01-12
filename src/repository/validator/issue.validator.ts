@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
-import { CreateImageDto } from 'src/interface/dto/image.dto';
-import { CreateIssueBody } from 'src/interface/dto/issue.dto';
+import { CreateImageDto } from 'src/common/interface/dto/image.dto';
+import { CreateIssueBody } from 'src/common/interface/dto/issue.dto';
 
 // Create
 export const createIssueWithImageValidator = (

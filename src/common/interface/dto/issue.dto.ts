@@ -16,7 +16,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { categoryParser } from 'src/util/issue';
+import { categoryParser } from 'src/common/util/issue';
 
 export class GetIssuesQuery {
   @Transform(({ value }: { value: string }) => {

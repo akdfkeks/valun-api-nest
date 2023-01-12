@@ -3,15 +3,15 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateImageDto } from 'src/interface/dto/image.dto';
+import { CreateImageDto } from 'src/common/interface/dto/image.dto';
 import {
   CreateRejectionBody,
   CreateSolutionBody,
-} from 'src/interface/dto/solution.dto';
+} from 'src/common/interface/dto/solution.dto';
 import SolutionRepository from 'src/repository/solution.repository';
-import { checkBoolean, checkValues } from 'src/util/function';
-import { rawIssueToDto } from 'src/util/issue';
-import { rawSolutionToDto } from 'src/util/solution';
+import { checkBoolean, checkValues } from 'src/common/util/function';
+import { rawIssueToDto } from 'src/common/util/issue';
+import { rawSolutionToDto } from 'src/common/util/solution';
 import { IssueService } from './issue.service';
 import { StorageService } from './storage.service';
 

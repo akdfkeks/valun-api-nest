@@ -4,7 +4,7 @@ import {
   IIssue,
   IIssueIncludable,
   IssueIncludable,
-} from 'src/interface/dto/issue.dto';
+} from 'src/common/interface/dto/issue.dto';
 
 export const rawIssueToDto = (userId: string, issue: IRawIssue): IIssue => {
   try {

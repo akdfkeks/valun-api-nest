@@ -8,12 +8,12 @@ import {
   Solution,
   User,
 } from '@prisma/client';
-import { CreateImageDto } from 'src/interface/dto/image.dto';
+import { CreateImageDto } from 'src/common/interface/dto/image.dto';
 import {
   CreateIssueBody,
   IExtendedRawIssue,
   IssueIncludable,
-} from 'src/interface/dto/issue.dto';
+} from 'src/common/interface/dto/issue.dto';
 import { PrismaService } from 'src/service/prisma.service';
 import {
   categoryAndImage,

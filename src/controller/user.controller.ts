@@ -9,14 +9,14 @@ import {
   Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { CreateUserDto } from 'src/interface/dto/user.dto';
+import { CreateUserDto } from 'src/common/interface/dto/user.dto';
 import { StrictJwtGuard } from 'src/provider/guard/strict-jwt.guard';
 import { UserService } from 'src/service/user.service';
 import { Request } from 'express';
 import { IssueService } from 'src/service/issue.service';
 import { Query } from '@nestjs/common';
 import { IssueStatus } from '@prisma/client';
-import { IssueStatusQuery } from 'src/interface/dto/issue.dto';
+import { IssueStatusQuery } from 'src/common/interface/dto/issue.dto';
 import { SolutionService } from 'src/service/solution.service';
 
 @Controller('user')

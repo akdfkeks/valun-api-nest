@@ -6,7 +6,7 @@ import {
 import { S3 } from 'aws-sdk';
 import * as path from 'path';
 import * as sharp from 'sharp';
-import { CreateImageDto } from 'src/interface/dto/image.dto';
+import { CreateImageDto } from 'src/common/interface/dto/image.dto';
 
 interface UploadOptions {
   resize?: {

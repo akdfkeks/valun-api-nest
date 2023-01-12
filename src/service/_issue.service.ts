@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Multer } from 'multer';
-import { CreateIssueBody } from 'src/interface/dto/issue.dto';
+import { CreateIssueBody } from 'src/common/interface/dto/issue.dto';
 import { IssueRepository } from 'src/repository/_issue.repository';
-import { exclude } from 'src/util/function';
+import { exclude } from 'src/common/util/function';
 import { StorageService } from './storage.service';
 
 @Injectable()

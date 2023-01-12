@@ -13,7 +13,10 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
-import { GetIssuesQuery, CreateIssueBody } from 'src/interface/dto/issue.dto';
+import {
+  GetIssuesQuery,
+  CreateIssueBody,
+} from 'src/common/interface/dto/issue.dto';
 import { StrictJwtGuard } from 'src/provider/guard/strict-jwt.guard';
 import { IssueService } from 'src/service/issue.service';
 
