@@ -43,8 +43,12 @@ export class UserService {
     };
   }
 
-  async findUniqueUser(id: string) {
+  async findUniqueUserById(id: string) {
     return await this.userRepository.findById(id);
+  }
+
+  async findUniqueUserByNick(nick: string) {
+    return await this.userRepository.findByNick(nick);
   }
 
   private async hashPw(plain: string) {
