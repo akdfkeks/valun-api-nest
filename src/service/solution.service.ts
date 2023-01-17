@@ -83,7 +83,7 @@ export class SolutionService {
 
     return {
       message: `Issue ID : ${solution.issueId} 에 대한 해결 요청을 수락하였습니다.`,
-      data: {},
+      data: null,
     };
   }
 
