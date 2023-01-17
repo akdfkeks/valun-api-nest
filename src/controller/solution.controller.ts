@@ -26,10 +26,10 @@ import { SolutionService } from 'src/service/solution.service';
 export class SolutionController {
   constructor(private solutionService: SolutionService) {}
 
-  @Post(':id/accept')
+  @Post('accept')
   async postAllow(
     @Req() req: Request,
-    @Param('id', new ParseIntPipe()) id: number,
+    @Body('id', new ParseIntPipe()) id: number,
   ) {
     return this.solutionService.acceptSolution(req.user, id);
   }
