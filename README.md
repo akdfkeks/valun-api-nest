@@ -1,73 +1,31 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# VALUN - *우리동네 자율정화 커뮤니티*
+##
+> *VALUN 은 2023-2 가천대학교 컴퓨터공학과 졸업 심사를 위해 Express.js, React.js 로 제작한 프로젝트입니다.*
+> *이후 2023-동계 P-커리어캐치 프로그램에 참여하여 Nest.js 및 IOS App 으로 Migration 하였습니다.*
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+VALUN 은 우리 주변에 발생한 문제를 공유하고 자발적으로 해결할 수 있는 기회를 제공하는 공공목적의 커뮤니티 입니다. <br />
+제보자가 주변의 문제(Issue)를 인식하고 사진 찍어 업로드하면, AI 를 통해 사진 속 특정 대상 (위험 시설물, 환경 저해요소) 를 감지합니다. <br />
+제보된 Issue 는 분류별 일러스트와 함께 지도에 표시되어 다른 사용자가 쉽게 그 종류와 위치를 파악할 수 있도록 제공됩니다. <br />
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
+- 사진과 GPS 정보를 통한 Issue 제보 및 해결 기능
+- Yolo v5 (AI Model) 을 이용한 사진 속 위험 시설물, 환경 저해요소 검출
+- [미구현] Issue 제보, 해결을 통해 획득한 포인트를 사용할 수 있는 커뮤니티
 
-## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Tech
 
-## Installation
+VALUN 에 사용된 주요 라이브러리 및 프레임워크 입니다.
 
-```bash
-$ npm install
-```
+- [NestJS] - Node.js framework for building server-side application
+- [Prisma] - Node.js ORM Library
+- [ReactJS] - JS Library for building component based UI
+- [FastAPI] - Python framework for building server-side application
+- [Yolo v5] - Object detection model
 
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+[//]: # (Reference links)
+   [NestJS]: <https://nestjs.com/>
+   [Prisma]: <https://www.prisma.io/>
+   [ReactJS]: <https://react.dev/>
+   [FastAPI]: <https://fastapi.tiangolo.com/>
+   [Yolo v5]: <https://github.com/ultralytics/yolov5>
